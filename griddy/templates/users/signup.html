@@ -1,0 +1,19 @@
+{% extends '_base.html' %}
+{% load crispy_forms_filters %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Amazing, join the team!!!!!" %}{% endblock %}
+
+{% block content %}
+    <h2>{% trans "Sign up" %}</h2>
+    <form method="post" action="{% url 'users:signup' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="{% translate 'Sign Up' %}"
+               class="btn btn-primary w-100">
+        <hr>
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+{% endblock content %}

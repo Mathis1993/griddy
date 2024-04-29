@@ -1,0 +1,96 @@
+[tool.setuptools]
+py-modules = []
+
+[project]
+name = "griddy"
+version = "1"
+dependencies = [
+    # Django
+    "Django==5.0.4",
+    # Database
+    "psycopg2-binary==2.9.6",
+    # ENVIRONMENT
+    "python-dotenv==1.0.0",
+    # EMAILS
+    "sendgrid==6.10.0",
+    # DEPLOYMENT
+    "gunicorn==21.2.0",
+    # DJANGO DEVELOPMENT UTILITIES
+    "django-extensions==3.2.3",
+    # STATIC FILES
+    "whitenoise==6.5.0",
+    # TEMPLATING
+    "crispy-bootstrap5==0.7",
+]
+
+[project.optional-dependencies]
+local = [
+    "black==23.3.0",
+    "isort==5.12.0",
+    "pre-commit==3.3.2",
+    "pip-tools==7.4.1",
+]
+test = [
+    "pytest==7.3.1",
+    "pytest-django==4.5.2",
+    "factory-boy==3.2.1",
+    "pytest-freezegun==0.4.2",
+    "pytest-mock==3.11.1",
+    "pytest-cov==4.1.0",
+    "pytest-xdist==3.3.1",
+    "pytest-recording==0.13.0",
+]
+
+# Configration file a python project
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+force-exclude = """
+/(
+    .git
+  | .hg
+  | .eggs
+  | .mypy_cache
+  | .tox
+  | .venv
+  | .venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+"""
+
+[tool.isort]
+profile = "black"
+line_length = 100
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+no_lines_before = "LOCALFOLDER"
+skip_glob = ["*/migrations/*.py"]
+src_paths = ["src", "."]
+known_thirdparty = ["django"]
+
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/prototypes/*",
+    "*/site-packages/*",
+    "*/test_*",
+    "scripts/*",
+    "docker/*",
+    "config/*",
+]
+
+[tool.coverage.report]
+precision = 2
+
+[tool.pytest.ini_options]
+python_files = "tests.py test_*.py *_tests.py"
+DJANGO_SETTINGS_MODULE= "config.settings.test"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "jwt_scope: sets required scope for api test",
+]

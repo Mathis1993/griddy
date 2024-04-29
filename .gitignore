@@ -1,0 +1,20 @@
+# All files listed here will be ignored by git
+.idea
+.docker
+.env
+
+# Mac
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Celery Beat Scheduler
+celerybeat-schedule
+
+# Ngrok
+ngrok
+
+# pip-tools
+griddy.egg-info/

@@ -1,0 +1,105 @@
+# docker-compose file for the staging environment where all components of the project
+# are run as services (postgres, redis, django, celery consumer, celery scheduler):
+# Note that the staging system expects a traefik reverse proxy to be running on the host
+# independently of this docker-compose file.
+version: '3.8'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:15.2
+    networks:
+      - overlay
+    env_file:
+      - ./.env
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  redis:
+    restart: always
+    image: redis:7-alpine
+    networks:
+      - overlay
+    volumes:
+      - ./redis/data:/var/lib/redis/data
+
+  django:
+    restart: always
+    image: ${APP_TEST_IMAGE}
+    networks:
+      - overlay
+      - web
+    env_file:
+      - ./.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.django-nginx.entrypoints=http"
+      - "traefik.http.routers.django-nginx.priority=1"
+      - "traefik.http.routers.django-nginx.rule=Host(`staging_domain`)"
+      - "traefik.http.routers.django-nginx.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.django-nginx-secure.entrypoints=https"
+      - "traefik.http.routers.django-nginx-secure.priority=1"
+      - "traefik.http.routers.django-nginx-secure.rule=Host(`staging_domain`)"
+      - "traefik.http.routers.django-nginx-secure.tls=true"
+      - "traefik.http.routers.django-nginx-secure.tls.certresolver=dnsimple"
+      - "traefik.http.routers.django-nginx-secure.tls.domains[0].main=production_domain"
+      - "traefik.http.routers.django-nginx-secure.tls.domains[0].sans=*.production_domain"
+      - "traefik.http.services.django-nginx.loadbalancer.server.port=8000"
+
+# ToDo
+#  traefik:
+#    image: traefik:v2.1
+#    container_name: traefik
+#    command:
+#      #### These are the CLI commands that will configure Traefik and tell it how to work! ####
+#      ## API Settings - https://docs.traefik.io/operations/api/, endpoints - https://docs.traefik.io/operations/api/#endpoints ##
+#      - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+#      - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
+#      # - --api.insecure=true
+#      ## Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO) - https://docs.traefik.io/observability/logs/ ##
+#      - --log.level=DEBUG # <== Setting the level of the logs from traefik
+#      ## Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+#      - --providers.docker=true # <== Enabling docker as the provider for traefik
+#      - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
+#      - --providers.docker.network=web # <== Operate on the docker network named web
+#      ## Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+#      - --entrypoints.http.address=:80 # <== Defining an entrypoint for port :80 named web
+#      - --entrypoints.https.address=:443 # <== Defining an entrypoint for https on port :443 named web-secured
+#      ## Certificate Settings (Let's Encrypt) - https://docs.traefik.io/https/acme/#configuration-examples ##
+#      - --certificatesresolvers.dnsimple.acme.dnschallenge=true
+#      - --certificatesresolvers.dnsimple.acme.dnschallenge.provider=dnsimple
+#      - --certificatesresolvers.dnsimple.acme.email=certs_email # <== Setting email for certs
+#      - --certificatesresolvers.dnsimple.acme.storage=/letsencrypt/acme.json # <== Defining acme file to store cert information
+#      # - --certificatesresolvers.mytlschallenge.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.middlewares.traefik-basic-auth.basicauth.users=$TRAEFIK_AUTH_USER:$TRAEFIK_AUTH_PASSWORD" # <== basic auth access
+#      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+#      - "traefik.http.routers.traefik.entrypoints=http"
+#      - "traefik.http.routers.traefik.priority=2"
+#      - "traefik.http.routers.traefik.rule=Host(`$TRAEFIK_URL`)"
+#      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+#      - "traefik.http.routers.traefik-secure.entrypoints=https"
+#      - "traefik.http.routers.traefik-secure.priority=2"
+#      - "traefik.http.routers.traefik-secure.rule=Host(`$TRAEFIK_URL`)"
+#      - "traefik.http.routers.traefik-secure.middlewares=traefik-basic-auth"
+#      - "traefik.http.routers.traefik-secure.tls=true"
+#      - "traefik.http.routers.traefik-secure.tls.certresolver=dnsimple"
+#      - "traefik.http.routers.traefik-secure.service=api@internal"
+#    restart: always
+#    ports:
+#      - 80:80
+#      - 443:443
+#    networks:
+#      - web
+#    volumes:
+#      - /home/docker/letsencrypt:/letsencrypt # <== Volume for certs (TLS)
+#      - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
+#    environment:
+#      DNSIMPLE_OAUTH_TOKEN: ${DNSIMPLE_OAUTH_TOKEN}
+#      DNSIMPLE_BASE_URL: ${DNSIMPLE_BASE_URL}
+
+networks:
+  overlay:
+  web:
+    external: true

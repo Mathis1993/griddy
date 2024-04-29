@@ -1,0 +1,14 @@
+[flake8]
+ignore = D203 E203 W503 E722
+max-complexity = 10
+max-line-length = 100
+
+inline-quotes = double
+multiline-quotes = double
+
+# note: this needs to be synced with the exclude in the .pre-commit-config.yaml
+# flake8 declared the behaviour a feature, fair, but annoying.
+# https://gitlab.com/pycqa/flake8/-/issues/10
+exclude = .git .hg .idea venv __pycache__ */migrations/* config
+
+# flake8 is used as a pre-commit hook to improve code quality

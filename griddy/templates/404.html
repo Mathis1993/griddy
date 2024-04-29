@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}404 - Seite nicht gefunden{% endblock %}
+
+{% block content %}
+  <div class="max-width-700 mx-auto text-center pt-5 mt-5">
+    <img src="{% static 'images/telescope.svg' %}" alt="Telescope" style="max-width: 10rem;">
+    <h1 class="fs-4 fw-bold mt-3">Seite nicht gefunden</h1>
+    <p style="text-wrap: balance;" class="fs-6">Hier können wir leider nichts für dich finden, versuche eine Seite
+      zurückzugehen oder gehe zur Startseite.</p>
+    <div class="mt-4">
+      <a href="{% url 'home' %}" class="btn btn-primary fw-bold">Zur Startseite</a>
+    </div>
+    <small class="text-black-50 mt-4 d-block">Fehler: 404</small>
+  </div>
+{% endblock content %}

@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e
+
+USAGE="\
+USAGE: $0 COMMAND [ARGS...]
+
+Thin wrapper around pip, pip-compile, and shub to simplify dealing with our
+local package dependency.
+
+Available commands:
+ compile  Pin dependency versions
+ install  Install dependencies
+"
+
+if (( $# < 1))
+then
+  >&2 echo "$USAGE"
+  exit 1
+fi
+
+# Read .env file
+if [ -f .env ]
+then
+  export $(grep -v '^#' .env | xargs)
+fi
+
+COMMAND="$1"; shift
+
+case "$COMMAND" in
+  "compile")
+    export CUSTOM_COMPILE_COMMAND="$0 $COMMAND"
+    # pip-compile --output-file=requirements/base.txt pyproject.toml
+    pip-compile --output-file=requirements/base.txt pyproject.toml
+    pip-compile --extra local --output-file=requirements/local.txt pyproject.toml
+    pip-compile --extra test --output-file=requirements/test.txt pyproject.toml
+    ;;
+  "install")
+    # Make sure packages installed from wheels are available
+    pip install -r requirements/local.txt "$@"
+    pip install -r requirements/test.txt "$@"
+    ;;
+  *)
+    >&2 echo "Unknown command: ${COMMAND}"
+    exit 1
+    ;;
+esac

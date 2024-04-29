@@ -1,0 +1,45 @@
+{% load static %}
+{% load i18n %}
+
+<header>
+    <div class="container px-4">
+        <div class="row">
+            <div class="col-8 d-flex align-items-center"></div>
+            <div class="col-4 d-flex justify-content-end">
+                <div class="ms-auto">
+                    {% if user.is_authenticated %}
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="dropdown">
+                                <a href="#" role="button"
+                                       id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"
+                                   class="d-flex align-items-center justify-content-center btn btn-lg btn-primary rounded-circle text-decoration-none align-middle"
+                                   style="height: 48px; width: 48px;"
+                                >
+                                    <span class="material-symbols-rounded text-md"
+                                          style="font-size: 24px; font-weight: 300;">
+                                        {{ user.initials }}
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profil</a></li>
+                                    <li><a class="dropdown-item text-danger" href="{% url 'users:logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    {% else %}
+                        {% if "confirm-email" not in request.path %}
+                            <form class="form-inline ml-auto">
+                                <a href="{% url 'users:login' %}"
+                                   class="btn btn-outline-secondary">{% translate "Log in" %}</a>
+                                <a href="{% url 'users:signup' %}"
+                                   class="btn btn-primary ml-2">{% translate "Signup" %}</a>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

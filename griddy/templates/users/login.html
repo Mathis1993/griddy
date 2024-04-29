@@ -1,0 +1,23 @@
+{% extends '_base.html' %}
+{% load crispy_forms_filters %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Log in" %}{% endblock %}
+
+{% block content %}
+    <h2>{% trans "Log in" %}</h2>
+    <form method="post" action="{% url 'users:login' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="{% translate 'Login' %}"
+               class="btn btn-primary">
+        <hr> <!-- This adds a horizontal line for separation -->
+        <div class="text-center">
+            <a class="small"
+               href="{% url 'users:reset_password' %}">{% translate "Passwort vergessen?" %}</a>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+{% endblock content %}
