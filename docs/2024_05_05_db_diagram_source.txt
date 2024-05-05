@@ -1,0 +1,110 @@
+// Paste to dbdiagram.io to visualize
+
+Table users {
+  id integer [primary key]
+  email varchar
+  password varchar
+}
+
+Table devices {
+  id integer [primary key]
+  user_id integer [ref: - users.id]
+  specification_id integer [ref: - specifications.id]
+  api_key_id integer [ref: - api_keys.id]
+  address_id integer [ref: - addresses.id]
+}
+
+Table addresses {
+  id integer [primary key]
+  zip_code_id integer [ref: - zip_codes.id]
+}
+
+Table zip_codes {
+  id integer [primary key]
+  code integer
+}
+
+Table specifications {
+  id integer [primary key]
+  manufacturer_id integer [ref: - manufacturers.id]
+  name varchar
+  content_type integer [ref: - content_types.id]
+  object_id integer
+  // Exemplary connected to samsung_heat_pumps;
+  // is polymorphic thanks to django content
+  // tpyes
+  content_object integer [ref: - samsung_heat_pumps.id]
+}
+
+// Exmaple for an entity type representing
+// a specific heat pump
+Table samsung_heat_pumps {
+  id integer [primary key]
+  samsung_specific_config varchar
+}
+
+Table manufacturers {
+  id integer [primary key]
+  name varchar
+}
+
+Table actions {
+  id integer [primary key]
+  // If a specification implements an action
+  // (via the e.g. samsung_heat_pumps class)
+  // there is an action linked to the model
+  // here.
+  // The specification class has got a method
+  // like execute_action(type: str)
+  specififcation_id integer [ref: - specifications.id]
+  type enum
+}
+
+Table api_keys {
+  id integer [primary key]
+  key varchar
+  expiration timestamp
+}
+
+Table commands {
+  id integer [primary key]
+  device_id integer [ref: - devices.id]
+  execution_time timestamp
+  executed bool
+  action_id integer [ref: - actions.id]
+}
+
+Table netzentgelt_rates {
+  id integer [primary key]
+  zip_code_id integer [ref: - zip_codes.id]
+  rate float
+  start timestamp
+  end timestamp
+}
+
+Table execution_conditions {
+  id integer [primary key]
+  device_id integer [ref: - devices.id]
+  content_type integer [ref: - content_types.id]
+  object_id integer
+  // Exemplary connected to global_switches;
+  // is polymorphic thanks to django content
+  // tpyes
+  content_object integer [ref: - global_switches.id]
+}
+
+// Example for an entity type representing
+// a specific kind of excution condition
+// with that the griddy control can be
+// switched on/off by the user
+// (other examples could be a user-defined
+// schedule or a power production threshold)
+Table global_switches {
+  id integer [primary key]
+  griddy_control_on bool
+}
+
+// Django content types
+Table content_types {
+  id integer [primary key]
+}
