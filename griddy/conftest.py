@@ -4,8 +4,7 @@ to avoid code duplication.
 """
 
 import pytest
-
-from griddy.users.tests.factories import UserFactory
+from users.tests.factories import UserFactory
 
 
 @pytest.fixture
