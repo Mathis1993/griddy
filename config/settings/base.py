@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # custom
     "core",
+    "devices",
+    "execution_conditions",
+    "external",
+    "netzentgelte",
     "users",
     # third-party
     "django_extensions",
