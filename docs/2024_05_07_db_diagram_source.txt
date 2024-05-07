@@ -65,7 +65,8 @@ Table commands {
   id integer [primary key]
   device_id integer [ref: > devices.id]
   execution_time timestamp
-  executed bool
+  // like waiting, declined, queued, executed 
+  execution_status enum
   action_id integer [ref: > actions.id]
 }
 
@@ -99,6 +100,13 @@ Table devices_execution_conditions {
   device_id integer [ref: > devices.id]
   execution_condition_id integer [ref: > execution_conditions.id]
 }
+
+Table commands_logs {
+  id integer [primary key]
+  command_id integer [ref: > commands.id]
+  failed_execution_condition_id integer [ref: > execution_conditions.id]
+  details varchar
+} 
 
 // Example for an entity type representing
 // a specific kind of excution condition
