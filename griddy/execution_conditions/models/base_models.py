@@ -1,9 +1,8 @@
+from core.models import TrackCreationAndUpdates
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-
-from core.models import TrackCreationAndUpdates
 
 
 class ExecutionCondition(TrackCreationAndUpdates):
@@ -18,3 +17,13 @@ class ExecutionCondition(TrackCreationAndUpdates):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_id")
 
+    def is_satisfied(self) -> bool:
+        return self.content_object.is_satisfied()
+
+
+class SpecificExecutionCondition(TrackCreationAndUpdates):
+    class Meta:
+        abstract = True
+
+    def is_satisfied(self) -> bool:
+        raise NotImplementedError("This method must be implemented in the subclass")

@@ -1,9 +1,12 @@
+from typing import Dict, Optional, Union
+
+from core.models import TrackCreationAndUpdates
+from devices.models.utils import ExecutionResult
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-
-from core.models import TrackCreationAndUpdates
+from execution_conditions.models import ExecutionCondition
 
 
 class Device(TrackCreationAndUpdates):
@@ -65,10 +68,25 @@ class Command(TrackCreationAndUpdates):
         to="devices.Action", on_delete=models.RESTRICT, related_name="commands"
     )
 
+    def execute(self) -> ExecutionResult:
+        execution_result = self.action.execute()
+        if execution_result.success:
+            self.execution_status = Command.ExecutionStatus.EXECUTED
+        else:
+            CommandLog.objects.create(
+                command=self,
+                failed_execution_condition=execution_result.failed_execution_condition,
+                message=execution_result.message,
+            )
+            self.execution_status = Command.ExecutionStatus.DECLINED
+        self.save()
+        return execution_result
+
 
 class Action(TrackCreationAndUpdates):
     class Meta:
         db_table = "devices_actions"
+        unique_together = ["device", "type"]
 
     class ActionType(models.TextChoices):
         TURN_ON = "turn_on"
@@ -78,21 +96,53 @@ class Action(TrackCreationAndUpdates):
         to="devices.Device", on_delete=models.CASCADE, related_name="actions"
     )
     type = models.CharField(choices=ActionType.choices, max_length=255)
-    parameters = models.JSONField()
+    parameters = models.JSONField(null=True, blank=True, default=None)
     execution_conditions = models.ManyToManyField(
         through="devices.ActionExecutionCondition",
         to="execution_conditions.ExecutionCondition",
         related_name="actions",
     )
 
+    def execute(self) -> ExecutionResult:
+        executable, failed_condition = self._is_executable()
+        if executable:
+            return self._execute()
+
+        return ExecutionResult(
+            success=False,
+            message="Action not executable",
+            failed_execution_condition=failed_condition,
+        )
+
+    def _is_executable(self) -> Union[bool, Optional[ExecutionCondition]]:
+        for execution_condition in self.device.execution_conditions.all():
+            if not execution_condition.is_satisfied():
+                return False, execution_condition
+
+        for execution_condition in self.execution_conditions.all():
+            if not execution_condition.is_satisfied():
+                return False, execution_condition
+
+        return True, None
+
+    def _execute(self) -> ExecutionResult:
+        device = self.device
+        action_method_name = device.content_object.actions.get(self.type)
+        if not action_method_name:
+            raise NotImplementedError(
+                f"Action {self.type} ({self.pk}) not supported "
+                f"by device {device.name} ({device.pk})"
+            )
+        action_method = getattr(device.content_object, action_method_name)
+        result = action_method()
+        return ExecutionResult(success=True, message="Execution successful", result=result)
+
 
 class CommandLog(TrackCreationAndUpdates):
     class Meta:
         db_table = "devices_commands_logs"
 
-    command = models.ForeignKey(
-        to="devices.Command", on_delete=models.CASCADE, related_name="logs"
-    )
+    command = models.ForeignKey(to="devices.Command", on_delete=models.CASCADE, related_name="logs")
     failed_execution_condition = models.ForeignKey(
         to="execution_conditions.ExecutionCondition",
         on_delete=models.CASCADE,
@@ -127,3 +177,15 @@ class ActionExecutionCondition(TrackCreationAndUpdates):
         on_delete=models.CASCADE,
         related_name="actions_execution_conditions",
     )
+
+
+class SpecificDevice(TrackCreationAndUpdates):
+    class Meta:
+        abstract = True
+
+    @property
+    def actions(self) -> Dict[Action.ActionType, str]:
+        raise NotImplementedError("actions property not implemented")
+
+    def register_actions(self, device_id: int):
+        [Action.objects.get_or_create(device_id=device_id, type=action) for action in self.actions]

@@ -1,8 +1,9 @@
-from core.models import TrackCreationAndUpdates
+from devices.models import Action
+from devices.models.base_models import SpecificDevice
 from django.db import models
 
 
-class HeatPump(TrackCreationAndUpdates):
+class HeatPump(SpecificDevice):
     class Meta:
         abstract = True
 
@@ -12,9 +13,6 @@ class HeatPump(TrackCreationAndUpdates):
         related_name="%(app_label)s_%(class)s",
     )
 
-    def register_actions(self):
-        raise NotImplementedError("register_actions method not implemented")
-
 
 class DummyHeatPump(HeatPump):
     class Meta:
@@ -22,3 +20,14 @@ class DummyHeatPump(HeatPump):
 
     name = models.CharField(max_length=255)
     some_config_value = models.CharField(max_length=255)
+
+    actions = {
+        Action.ActionType.TURN_ON: "turn_on",
+        Action.ActionType.TURN_OFF: "turn_off",
+    }
+
+    def turn_on(self):
+        return f"Turning on {self.name}"
+
+    def turn_off(self):
+        return f"Turning off {self.name}"
