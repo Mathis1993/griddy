@@ -10,7 +10,7 @@ class ApiFactory(factory.django.DjangoModelFactory):
         model = Api
         django_get_or_create = ("name",)
 
-    name = factory.Sequence(lambda n: f"api_{n}")
+    name = factory.fuzzy.FuzzyChoice(Api.ApiNames.values)
     base_url = factory.Faker("url")
 
 
