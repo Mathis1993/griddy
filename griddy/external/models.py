@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import models
 
 
-class Api(TrackCreationAndUpdates):
+class ApiConfig(TrackCreationAndUpdates):
     class Meta:
         db_table = "external_apis"
 
@@ -23,4 +23,6 @@ class ApiKey(TrackCreationAndUpdates):
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="api_keys"
     )
-    api = models.ForeignKey(to="external.Api", on_delete=models.CASCADE, related_name="api_keys")
+    api_config = models.ForeignKey(
+        to="external.ApiConfig", on_delete=models.CASCADE, related_name="api_keys"
+    )

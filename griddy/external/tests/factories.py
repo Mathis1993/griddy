@@ -2,15 +2,15 @@ from datetime import timedelta
 
 import factory.fuzzy
 from django.utils import timezone
-from external.models import Api, ApiKey
+from external.models import ApiConfig, ApiKey
 
 
 class ApiFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Api
+        model = ApiConfig
         django_get_or_create = ("name",)
 
-    name = factory.fuzzy.FuzzyChoice(Api.ApiNames.values)
+    name = factory.fuzzy.FuzzyChoice(ApiConfig.ApiNames.values)
     base_url = factory.Faker("url")
 
 

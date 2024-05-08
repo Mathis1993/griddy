@@ -7,8 +7,8 @@ class HeatPump(SpecificDevice):
     class Meta:
         abstract = True
 
-    api = models.ForeignKey(
-        to="external.Api",
+    api_config = models.ForeignKey(
+        to="external.ApiConfig",
         on_delete=models.RESTRICT,
         related_name="%(app_label)s_%(class)s",
     )
