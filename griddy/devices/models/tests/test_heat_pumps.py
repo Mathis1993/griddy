@@ -1,9 +1,21 @@
 import pytest
-from devices.models import Address, Device, Manufacturer
+from devices.models import Action, Address, Command, CommandLog, Device, Manufacturer
 from devices.tests.factories import DeviceFactory, DummyHeatPumpFactory
+from devices.tests.factories.base_factories import ActionFactory, CommandFactory
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+from execution_conditions.tests.factories import DummySwitchFactory, ExecutionConditionFactory
 from external.models import ApiKey
 from users.tests.factories import UserFactory
+
+
+@pytest.fixture()
+def user_with_dummy_heatpump():
+    user = UserFactory.create()
+    dummy_heat_pump = DummyHeatPumpFactory.create(name="Little Dummy")
+    device = DeviceFactory.create(user=user, specific_device=dummy_heat_pump)
+    dummy_heat_pump.register_actions(device.id)
+    return user, dummy_heat_pump, device
 
 
 @pytest.mark.django_db()
@@ -27,5 +39,104 @@ def test_registering_dummy_heat_pump_as_device():
     )
     assert device_2.content_object == dummy_heat_pump
 
-    # Action
-    # Command
+
+@pytest.mark.django_db()
+def test_executing_a_command(user_with_dummy_heatpump):
+    assert Action.objects.count() == 2
+
+    action_on = Action.objects.filter(type=Action.ActionType.TURN_ON).first()
+    action_off = Action.objects.filter(type=Action.ActionType.TURN_OFF).first()
+
+    command_on = CommandFactory.create(
+        execution_time=timezone.now(),
+        execution_status=Command.ExecutionStatus.WAITING,
+        action=action_on,
+    )
+    command_off = CommandFactory.create(
+        execution_time=timezone.now(),
+        execution_status=Command.ExecutionStatus.WAITING,
+        action=action_off,
+    )
+
+    assert command_on.execution_status == Command.ExecutionStatus.WAITING
+    assert command_off.execution_status == Command.ExecutionStatus.WAITING
+
+    result = command_on.execute()
+    assert result.success
+    assert result.result == "Turning on Little Dummy"
+
+    result = command_off.execute()
+    assert result.success
+    assert result.result == "Turning off Little Dummy"
+
+    command_on.refresh_from_db()
+    command_off.refresh_from_db()
+    assert command_on.execution_status == Command.ExecutionStatus.EXECUTED
+    assert command_off.execution_status == Command.ExecutionStatus.EXECUTED
+
+
+@pytest.mark.django_db()
+def test_executing_a_command_device_does_not_implement_action(user_with_dummy_heatpump):
+    _, _, device = user_with_dummy_heatpump
+    new_action = ActionFactory.create(type="so_new", device=device)
+    command = CommandFactory.create(
+        execution_time=timezone.now(),
+        execution_status=Command.ExecutionStatus.WAITING,
+        action=new_action,
+    )
+
+    with pytest.raises(NotImplementedError):
+        command.execute()
+
+
+@pytest.mark.django_db()
+def test_executing_a_command_with_execution_conditions(user_with_dummy_heatpump):
+    user, dummy_heat_pump, device = user_with_dummy_heatpump
+    dummy_switch_on = DummySwitchFactory.create(value=True)
+    dummy_switch_off = DummySwitchFactory.create(value=False)
+    execution_condition_1 = ExecutionConditionFactory.create(
+        name="condition_1", specific_condition=dummy_switch_on
+    )
+    execution_condition_2 = ExecutionConditionFactory.create(
+        name="condition_2", specific_condition=dummy_switch_off
+    )
+
+    action = Action.objects.filter(type=Action.ActionType.TURN_ON).first()
+    command_1 = CommandFactory.create(
+        execution_time=timezone.now(),
+        execution_status=Command.ExecutionStatus.WAITING,
+        action=action,
+    )
+    command_2 = CommandFactory.create(
+        execution_time=timezone.now(),
+        execution_status=Command.ExecutionStatus.WAITING,
+        action=action,
+    )
+
+    # all conditions fulfilled
+    device.execution_conditions.add(execution_condition_1)
+    action.execution_conditions.add(execution_condition_1)
+
+    result = command_1.execute()
+    assert result.success
+    assert result.message == "Execution successful"
+    assert result.result == "Turning on Little Dummy"
+
+    command_1.refresh_from_db()
+    assert command_1.execution_status == Command.ExecutionStatus.EXECUTED
+    assert not CommandLog.objects.exists()
+
+    # one condition not fulfilled
+    device.execution_conditions.add(execution_condition_2)
+
+    result = command_2.execute()
+    assert result.success is False
+    assert result.failed_execution_condition == execution_condition_2
+    assert result.message == "Action not executable"
+
+    command_2.refresh_from_db()
+    assert command_2.execution_status == Command.ExecutionStatus.DECLINED
+    assert CommandLog.objects.count() == 1
+    command_log = CommandLog.objects.first()
+    assert command_log.command == command_2
+    assert command_log.failed_execution_condition == execution_condition_2
