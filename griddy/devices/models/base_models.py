@@ -91,6 +91,7 @@ class Action(TrackCreationAndUpdates):
     class ActionType(models.TextChoices):
         TURN_ON = "turn_on"
         TURN_OFF = "turn_off"
+        SET_FLOW_TEMPERATURE = "set_flow_temperature"
 
     device = models.ForeignKey(
         to="devices.Device", on_delete=models.CASCADE, related_name="actions"
