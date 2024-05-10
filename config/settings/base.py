@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # third-party
     "django_extensions",
     "crispy_forms",
+    "crispy_tailwind",
 ]
 
 MIDDLEWARE = [
