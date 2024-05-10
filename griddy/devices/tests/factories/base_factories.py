@@ -12,9 +12,6 @@ class DeviceFactory(factory.django.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: f"device_{n}")
     user = factory.SubFactory("users.tests.factories.UserFactory")
-    api_key = factory.SubFactory(
-        "external.tests.factories.ApiKeyFactory", user=factory.SelfAttribute("..user")
-    )
     address = factory.SubFactory("devices.tests.factories.AddressFactory")
     manufacturer = factory.SubFactory("devices.tests.factories.ManufacturerFactory")
     content_type = None

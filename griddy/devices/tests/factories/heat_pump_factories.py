@@ -8,7 +8,7 @@ class DummyHeatPumpFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("name",)
 
     name = factory.Sequence(lambda n: f"dummy_heat_pump_{n}")
-    api = factory.SubFactory("external.tests.factories.ApiFactory")
+    api_key = factory.SubFactory("external.tests.factories.ApiKeyFactory")
     some_config_value = factory.fuzzy.FuzzyChoice(["a", "b", "c", "6"])
 
 
