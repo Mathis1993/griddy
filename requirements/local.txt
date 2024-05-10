@@ -20,15 +20,20 @@ click==8.1.7
     # via
     #   black
     #   pip-tools
+crispy-tailwind==1.0.3
+    # via griddy (pyproject.toml)
 distlib==0.3.8
     # via virtualenv
 django==5.0.4
     # via
+    #   crispy-tailwind
     #   django-crispy-forms
     #   django-extensions
     #   griddy (pyproject.toml)
 django-crispy-forms==2.1
-    # via griddy (pyproject.toml)
+    # via
+    #   crispy-tailwind
+    #   griddy (pyproject.toml)
 django-extensions==3.2.3
     # via griddy (pyproject.toml)
 filelock==3.13.4

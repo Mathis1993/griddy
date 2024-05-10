@@ -23,6 +23,7 @@ dependencies = [
     "requests==2.31.0",
     # TEMPLATING
     "django-crispy-forms==2.1",
+    "crispy-tailwind==1.0.3",
 ]
 
 [project.optional-dependencies]
