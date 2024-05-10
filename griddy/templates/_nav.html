@@ -31,17 +31,6 @@
                                 </ul>
                             </div>
                         </div>
-
-
-                    {% else %}
-                        {% if "confirm-email" not in request.path %}
-                            <form class="form-inline ml-auto">
-                                <a href="{% url 'users:login' %}"
-                                   class="btn btn-outline-secondary">{% translate "Log in" %}</a>
-                                <a href="{% url 'users:signup' %}"
-                                   class="btn btn-primary ml-2">{% translate "Signup" %}</a>
-                            </form>
-                        {% endif %}
                     {% endif %}
                 </div>
             </div>
