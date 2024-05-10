@@ -9,12 +9,6 @@ class HeatPump(SpecificDevice):
     class Meta:
         abstract = True
 
-    api_config = models.ForeignKey(
-        to="external.ApiConfig",
-        on_delete=models.RESTRICT,
-        related_name="%(app_label)s_%(class)s",
-    )
-
 
 class DummyHeatPump(HeatPump):
     class Meta:
@@ -50,9 +44,26 @@ class SmartthingsHeatPump(HeatPump):
         Action.ActionType.SET_FLOW_TEMPERATURE: "set_flow_temperature",
     }
 
-    def __init__(self):
-        super().__init__()
-        self.api = SmartthingsApi(base_url=self.api_config.base_url, token=self.api_config.key)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.api = SmartthingsApi(
+            base_url=self.api_key.api_config.base_url,
+            token=self.api_key.key,
+        )
+
+    @property
+    def status(self):
+        return self.api.device_status(self.smartthings_device_id)
+
+    def online(self, module_name: str) -> bool:
+        return self.status["components"][module_name]["switch"]["switch"]["value"] == "on"
+
+    def current_flow_temperature(self, module_name: str) -> int:
+        return int(
+            self.status["components"][module_name]["thermostatCoolingSetpoint"]["coolingSetpoint"][
+                "value"
+            ]
+        )
 
     def set_flow_temperature(self, temperature: int, module: str):
         command = FlowTemperatureCapability.set_flow_temperature(temperature, module=module)
