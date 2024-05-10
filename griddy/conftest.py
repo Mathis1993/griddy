@@ -23,3 +23,8 @@ def create_response(client):
 @pytest.fixture
 def user():
     return UserFactory.create()
+
+
+@pytest.fixture
+def vcr_config():
+    return {"record_mode": "once"}
