@@ -41,6 +41,14 @@ def test_registering_dummy_heat_pump_as_device(user):
 
 
 @pytest.mark.django_db()
+def test_device_reverse_generic_relation(user):
+    dummy_heat_pump = DummyHeatPumpFactory.create(name="Little Dummy", api_key__user=user)
+    device = DeviceFactory.create(user=user, specific_device=dummy_heat_pump)
+
+    assert dummy_heat_pump.generic_devices.first() == device
+
+
+@pytest.mark.django_db()
 def test_executing_a_command(user_with_dummy_heatpump):
     assert Action.objects.count() == 2
 
@@ -140,14 +148,6 @@ def test_executing_a_command_with_execution_conditions(user_with_dummy_heatpump)
     command_log = CommandLog.objects.first()
     assert command_log.command == command_2
     assert command_log.failed_execution_condition == execution_condition_2
-
-
-@pytest.mark.django_db()
-def test_device_reverse_generic_relation(user):
-    dummy_heat_pump = DummyHeatPumpFactory.create(name="Little Dummy", api_key__user=user)
-    device = DeviceFactory.create(user=user, specific_device=dummy_heat_pump)
-
-    assert dummy_heat_pump.generic_devices.first() == device
 
 
 @pytest.mark.django_db()
