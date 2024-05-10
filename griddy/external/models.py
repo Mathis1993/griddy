@@ -17,6 +17,7 @@ class ApiConfig(TrackCreationAndUpdates):
 class ApiKey(TrackCreationAndUpdates):
     class Meta:
         db_table = "external_api_keys"
+        unique_together = ("user", "api_config")
 
     key = models.TextField(unique=True)
     expiration = models.DateTimeField()

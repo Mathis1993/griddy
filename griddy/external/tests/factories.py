@@ -5,7 +5,7 @@ from django.utils import timezone
 from external.models import ApiConfig, ApiKey
 
 
-class ApiFactory(factory.django.DjangoModelFactory):
+class ApiConfigFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ApiConfig
         django_get_or_create = ("name",)
@@ -22,4 +22,4 @@ class ApiKeyFactory(factory.django.DjangoModelFactory):
     key = factory.Sequence(lambda n: f"api_key_{n}")
     expiration = factory.LazyAttribute(lambda _: timezone.now() + timedelta(days=1))
     user = factory.SubFactory("users.tests.factories.UserFactory")
-    api = factory.SubFactory(ApiFactory)
+    api_config = factory.SubFactory(ApiConfigFactory)

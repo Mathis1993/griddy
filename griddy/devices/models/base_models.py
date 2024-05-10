@@ -3,7 +3,7 @@ from typing import Dict, Optional, Union
 from core.models import TrackCreationAndUpdates
 from devices.models.utils import ExecutionResult
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from execution_conditions.models import ExecutionCondition
@@ -12,13 +12,13 @@ from execution_conditions.models import ExecutionCondition
 class Device(TrackCreationAndUpdates):
     class Meta:
         db_table = "devices_devices"
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
 
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="devices"
-    )
-    api_key = models.ForeignKey(
-        to="external.ApiKey", on_delete=models.RESTRICT, related_name="devices"
     )
     address = models.ForeignKey(
         to="devices.Address", on_delete=models.RESTRICT, related_name="devices"
@@ -183,6 +183,11 @@ class ActionExecutionCondition(TrackCreationAndUpdates):
 class SpecificDevice(TrackCreationAndUpdates):
     class Meta:
         abstract = True
+
+    generic_devices = GenericRelation(Device, related_query_name="%(app_label)s_%(class)s")
+    api_key = models.ForeignKey(
+        to="external.ApiKey", on_delete=models.RESTRICT, related_name="%(app_label)s_%(class)s"
+    )
 
     @property
     def actions(self) -> Dict[Action.ActionType, str]:
