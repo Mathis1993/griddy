@@ -37,7 +37,7 @@ def index(request: HttpRequest) -> HttpResponse:
         return redirect("home")
 
 
-class HomePageView(TemplateView):
+class HomePageView(LoginRequiredMixin, TemplateView):
     template_name = "users/home.html"
 
 
