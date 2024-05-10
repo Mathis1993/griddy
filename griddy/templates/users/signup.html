@@ -1,19 +1,34 @@
 {% extends '_base.html' %}
+{% load static %}
 {% load crispy_forms_filters %}
-
-{% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Amazing, join the team!" %}{% endblock %}
+{% block title %}Registrierung{% endblock %}
 
 {% block content %}
-    <h2>{% trans "Sign up" %}</h2>
-    <form method="post" action="{% url 'users:signup' %}">
+<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+  <a href="#"
+     class="flex items-center mb-6 text-2xl font-semibold text-gray dark:text-white">
+    <img class="w-8 h-8 mr-2"
+         src="{% static 'images/griddy.webp' %}"
+         alt="logo">
+    Griddy
+  </a>
+  <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+      <h1 class="text-xl font-bold md:text-2xl mb-3">Registrierung</h1>
+      <form method="post"
+            action="{% url 'users:signup' %}">
         {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit" value="{% translate 'Sign Up' %}"
-               class="btn btn-primary w-100">
-        <hr>
-        <input type="hidden" name="next" value="{{ next }}">
-    </form>
+        <input type="submit"
+               value="Registrieren"
+               class="btn btn-primary w-full mt-3">
+        <input type="hidden"
+               name="next"
+               value="{{ next }}">
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock content %}
