@@ -1,11 +1,14 @@
 import pytest
 from devices.models import Action, Address, Command, CommandLog, Device, Manufacturer
+from devices.models.heat_pumps import SmartthingsHeatPump
 from devices.tests.factories import DeviceFactory, DummyHeatPumpFactory
 from devices.tests.factories.base_factories import ActionFactory, CommandFactory
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from execution_conditions.tests.factories import DummySwitchFactory, ExecutionConditionFactory
-from external.models import ApiKey
+from external.models import ApiConfig, ApiKey
+from external.tests.factories import ApiConfigFactory, ApiKeyFactory
 from users.tests.factories import UserFactory
 
 
@@ -140,3 +143,45 @@ def test_executing_a_command_with_execution_conditions(user_with_dummy_heatpump)
     command_log = CommandLog.objects.first()
     assert command_log.command == command_2
     assert command_log.failed_execution_condition == execution_condition_2
+
+
+@pytest.mark.django_db()
+@pytest.mark.vcr()
+@pytest.mark.block_network()
+def test_smartthings_heat_pump(user):
+    api_config = ApiConfigFactory.create(
+        name=ApiConfig.ApiNames.SMARTTHINGS,
+        base_url="https://api.smartthings.com/v1/",
+    )
+    api_key = ApiKeyFactory.create(
+        user=user,
+        key=settings.TEST_SMARTTHINGS_API_TOKEN,
+        api_config=api_config,
+    )
+    heat_pump = SmartthingsHeatPump.objects.create(
+        name="my_heat_pump",
+        smartthings_device_id=settings.TEST_SMARTTHINGS_DEVICE_ID,
+        module_name_water="main",
+        module_name_heating="INDOOR",
+        default_flow_temperature_water=35,
+        default_flow_temperature_heating=35,
+        api_key=api_key,
+    )
+
+    assert heat_pump.api.base_url == "https://api.smartthings.com/v1/"
+    assert heat_pump.api.token == settings.TEST_SMARTTHINGS_API_TOKEN
+
+    assert heat_pump.actions == {
+        Action.ActionType.SET_FLOW_TEMPERATURE: "set_flow_temperature",
+    }
+
+    module_name = "INDOOR"
+    assert heat_pump.online(module_name) is True
+
+    current_flow_temperature = heat_pump.current_flow_temperature(module_name)
+    assert current_flow_temperature == 35
+
+    heat_pump.set_flow_temperature(temperature=50, module=module_name)
+
+    current_flow_temperature = heat_pump.current_flow_temperature(module_name)
+    assert current_flow_temperature == 50
