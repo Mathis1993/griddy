@@ -1,0 +1,53 @@
+interactions:
+- request:
+    body: '{"commands": [{"component": "INDOOR", "capability": "thermostatCoolingSetpoint",
+      "command": "setCoolingSetpoint", "arguments": [50]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer test_token
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '134'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://api.smartthings.com/v1/devices/test_device_id/commands
+  response:
+    body:
+      string: '{"results":[{"id":"test_device_id","status":"COMPLETED"}]}'
+    headers:
+      Access-Control-Allow-Headers:
+      - DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control,Content-Type,Accept,Authorization,X-ST-Client,X-ST-Api-Version,X-ST-Client-AppVersion,X-ST-Client-OS,X-ST-Client-DeviceModel
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 10 May 2024 11:26:24 GMT
+      Server:
+      - openresty
+      Transfer-Encoding:
+      - chunked
+      X-RateLimit-Limit:
+      - '120'
+      X-RateLimit-Remaining:
+      - '120'
+      X-RateLimit-Reset:
+      - '35203'
+      content-encoding:
+      - gzip
+    status:
+      code: 200
+      message: OK
+version: 1

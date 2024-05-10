@@ -4,6 +4,7 @@ Django base settings for griddy project.
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import os
 import sys
 from pathlib import Path
@@ -45,6 +46,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # custom
     "core",
+    "devices",
+    "execution_conditions",
+    "external",
+    "netzentgelte",
     "users",
     # third-party
     "django_extensions",
@@ -116,8 +121,8 @@ TIME_ZONE = "Europe/Berlin"
 
 USE_I18N = True
 
-# Users are and always will be only in Germany
-USE_TZ = False
+# django.utils.timezone.now() will return tz-aware datetime objects (in UTC)
+USE_TZ = True
 
 # Directory for storing translation files
 # Run python manage.py makemessages -l de to create translation files

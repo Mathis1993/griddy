@@ -21,6 +21,8 @@ dependencies = [
     "whitenoise==6.5.0",
     # TEMPLATING
     "crispy-bootstrap5==0.7",
+    # REQUESTS
+    "requests==2.31.0",
 ]
 
 [project.optional-dependencies]
