@@ -27,7 +27,7 @@ class Command:
                     "component": self.module,
                     "capability": self.capability_name,
                     "command": self.name,
-                    "arguments": list(self.arguments),
+                    "arguments": list(self.arguments or []),
                 }
             ]
         }
