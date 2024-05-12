@@ -1,14 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["../griddy/templates/**/*.{html,js}"],
+  content: [
+      "../griddy/templates/**/*.html",
+      "../griddy/static/js/**/*.js",
+      "./node_modules/preline/dist/*.js",
+  ],
   darkMode: 'class',
   theme: {
   },
-  daisyui: {
-    themes: ["cupcake"],
-  },
   plugins: [
       require("@tailwindcss/typography"),
-      require('daisyui'),
+      require("@tailwindcss/forms"),
+      require("preline/plugin"),
   ],
 }

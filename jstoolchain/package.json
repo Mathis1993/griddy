@@ -6,14 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tailwind-watch": "tailwindcss -i ../input.css -o ../griddy/static/css/output.css --watch",
-    "tailwind-build": "tailwindcss -i ../input.css -o ../griddy/static/css/output.css --minify"
+    "tailwind-build": "tailwindcss -i ../input.css -o ../griddy/static/css/output.css --minify",
+    "js-build": "vite build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.13",
-    "daisyui": "4.11.1",
-    "tailwindcss": "3.4.3"
+    "@tailwindcss/forms": "0.5.7",
+    "@tailwindcss/typography": "0.5.13",
+    "tailwindcss": "3.4.3",
+    "vite": "5.2.11"
+  },
+  "dependencies": {
+    "preline": "2.1.0"
   }
 }
