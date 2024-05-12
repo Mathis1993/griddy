@@ -21,3 +21,6 @@ griddy.egg-info/
 
 # Node
 node_modules/
+
+# Tailwind CSS
+output.css
