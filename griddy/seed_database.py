@@ -1,46 +1,66 @@
+from datetime import timedelta
+
+from devices.tests.factories import AddressFactory, DeviceFactory, ManufacturerFactory
+from devices.tests.factories.heat_pump_factories import SmartthingsHeatPumpFactory
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
-from users.tests.factories import UserFactory
+from django.utils import timezone
+from execution_conditions.tests.factories import (
+    ExecutionConditionFactory,
+    GlobalSwitchHeatPumpFactory,
+)
+from external.tests.factories import ApiConfigFactory, ApiKeyFactory
+from netzentgelte.tests.factories import ZipCodeFactory
 
 User = get_user_model()
 
 
 def seed_database():
-    """
-    Seed the development database with some initial data and users so that the
-    local application is ready to use.
+    _seed_database(
+        smartthings_api_key=settings.TEST_SMARTTHINGS_API_TOKEN,
+        smartthings_device_id=settings.TEST_SMARTTHINGS_DEVICE_ID,
+    )
 
-    Returns
-    -------
-    None
-    """
-    User.objects.create_superuser(
-        email="admin@production_domain.de",
+
+def _seed_database(smartthings_api_key: str, smartthings_device_id: str):
+    user = User.objects.create_superuser(
+        email="john@ofus.com",
         password=settings.TEST_USER_PASSWORD,
     )
-    UserFactory.create(email="user@production_domain.de", password=settings.TEST_USER_PASSWORD)
-    create_contents()
 
+    api_config = ApiConfigFactory.create(
+        name="smartthings", base_url="https://api.smartthings.com/v1/"
+    )
+    api_key = ApiKeyFactory.create(
+        key=smartthings_api_key,
+        expiration=timezone.now() + timedelta(days=365),
+        user=user,
+        api_config=api_config,
+    )
 
-def seed_database_staging():
-    """
-    Seed the staging database with normalized entities, essentially just wrapping the
-    create_contents() function.
+    zip_code = ZipCodeFactory.create(code="12345")
+    address = AddressFactory.create(zip_code=zip_code)
 
-    Returns
-    -------
-    None
-    """
-    create_contents()
+    manufacturer = ManufacturerFactory.create(name="samsung")
+    smartthings_heat_pump = SmartthingsHeatPumpFactory.create(
+        name="wingst_heat_pump",
+        api_key=api_key,
+        smartthings_device_id=smartthings_device_id,
+        default_flow_temperature_water=35,
+        default_flow_temperature_heating=35,
+    )
+    device = DeviceFactory.create(
+        name="wingst_device",
+        user=user,
+        address=address,
+        manufacturer=manufacturer,
+        specific_device=smartthings_heat_pump,
+    )
 
-
-def create_contents():
-    """
-    Create some normalized entities in the database.
-
-    Returns
-    -------
-    None
-    """
-    return
+    global_switch = GlobalSwitchHeatPumpFactory.create(control_heat_pump=False)
+    execution_condition = ExecutionConditionFactory.create(
+        name="control_wingst_heat_pump",
+        user=user,
+        specific_condition=global_switch,
+    )
+    device.execution_conditions.add(execution_condition)
