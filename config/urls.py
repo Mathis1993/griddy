@@ -26,4 +26,5 @@ urlpatterns = [
     # ToDo(ME-15.12.23):
     # path("sample_app/", include("sample_app.urls", namespace="sample_app")),
     path("users/", include("users.urls", namespace="users")),
+    path("devices/", include("devices.urls", namespace="devices")),
 ]
