@@ -3,7 +3,8 @@ __all__ = [
     "ExecutionCondition",
     # global_switches.py
     "DummySwitch",
+    "GlobalSwitchHeatPump",
 ]
 
 from execution_conditions.models.base_models import ExecutionCondition
-from execution_conditions.models.global_switches import DummySwitch
+from execution_conditions.models.global_switches import DummySwitch, GlobalSwitchHeatPump

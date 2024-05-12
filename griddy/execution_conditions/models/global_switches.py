@@ -10,3 +10,13 @@ class DummySwitch(SpecificExecutionCondition):
 
     def is_satisfied(self) -> bool:
         return self.value
+
+
+class GlobalSwitchHeatPump(SpecificExecutionCondition):
+    class Meta:
+        db_table = "execution_conditions_global_switches"
+
+    control_heat_pump = models.BooleanField(default=False)
+
+    def is_satisfied(self) -> bool:
+        return self.value
