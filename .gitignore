@@ -23,4 +23,7 @@ griddy.egg-info/
 node_modules/
 
 # Tailwind CSS
-output.css
+static/css/output.css
+
+# Preline
+static/js/vendored/main.js
