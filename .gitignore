@@ -18,3 +18,12 @@ ngrok
 
 # pip-tools
 griddy.egg-info/
+
+# Node
+node_modules/
+
+# Tailwind CSS
+griddy/static/css/output.css
+
+# Preline
+griddy/static/js/vendored/main.js

@@ -1,0 +1,17 @@
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    outDir: '../griddy/static/js/vendored',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: 'main.js', // Path to entry file
+      output: {
+        // Disable Cache Busting here, as it will be Done by Django via the whitenoise
+        // CompressedManifestStaticFilesStorage
+        entryFileNames: '[name].js',
+        assetFileNames: 'assets/[name].[ext]'
+      }
+    }
+  }
+});

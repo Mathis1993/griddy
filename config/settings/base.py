@@ -19,7 +19,7 @@ sys.path.append(str(BASE_DIR))
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / "static_root"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     # third-party
     "django_extensions",
     "crispy_forms",
-    "crispy_bootstrap5",
+    "crispy_tailwind",
 ]
 
 MIDDLEWARE = [
@@ -170,5 +170,5 @@ EMAIL_USE_TLS = True
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "tailwind"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"

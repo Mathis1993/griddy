@@ -1,23 +1,52 @@
 {% extends '_base.html' %}
 {% load crispy_forms_filters %}
-
-{% load i18n %}
+{% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Log in" %}{% endblock %}
+{% block title %}Anmeldung{% endblock %}
 
 {% block content %}
-    <h2>{% trans "Log in" %}</h2>
-    <form method="post" action="{% url 'users:login' %}">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit" value="{% translate 'Login' %}"
-               class="btn btn-primary">
-        <hr> <!-- This adds a horizontal line for separation -->
-        <div class="text-center">
-            <a class="small"
-               href="{% url 'users:reset_password' %}">{% translate "Passwort vergessen?" %}</a>
-        </div>
-        <input type="hidden" name="next" value="{{ next }}">
-    </form>
+<div class="flex flex-col justify-center md:w-1/2 mx-auto md:h-screen">
+  <a href="{% url 'home' %}"
+     class="flex items-center justify-center mb-6 text-2xl font-semibold text-gray dark:text-white">
+    <img class="w-8 h-8 mr-2"
+         src="{% static 'images/griddy.webp' %}"
+         alt="logo">
+    Griddy
+  </a>
+  <div class="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
+    <div class="p-4 sm:p-7">
+      <div class="text-center">
+        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Anmeldung</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+          Noch keinen Account?
+          <a class="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+             href="{% url 'users:signup' %}">
+            Registrieren
+          </a>
+        </p>
+      </div>
+      <div class="mt-5">
+        <!-- Form -->
+        <form method="post"
+              action="{% url 'users:login' %}">
+          <div class="grid gap-y-4">
+            <div class="relative">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <a class="text-sm text-blue-600 decoration-2 hover:underline font-medium"
+                 href="{% url 'users:reset_password' %}">Passwort vergessen?</a>
+            </div>
+            <!-- End Form Group -->
+            <button type="submit"
+                    class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+              Anmelden
+            </button>
+          </div>
+        </form>
+        <!-- End Form -->
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}

@@ -9,6 +9,10 @@ class HeatPump(SpecificDevice):
     class Meta:
         abstract = True
 
+    @classmethod
+    def get_integration_name(cls) -> str:
+        raise NotImplementedError("Method get_integration_name must be implemented in subclass")
+
 
 class DummyHeatPump(HeatPump):
     class Meta:
@@ -21,6 +25,10 @@ class DummyHeatPump(HeatPump):
         Action.ActionType.TURN_ON: "turn_on",
         Action.ActionType.TURN_OFF: "turn_off",
     }
+
+    @classmethod
+    def get_integration_name(cls):
+        return "Dummy"
 
     def turn_on(self):
         return f"Turning on {self.name}"
@@ -50,6 +58,10 @@ class SmartthingsHeatPump(HeatPump):
             base_url=self.api_key.api_config.base_url,
             token=self.api_key.key,
         )
+
+    @classmethod
+    def get_integration_name(cls):
+        return "Samsung Smartthings"
 
     @property
     def status(self):

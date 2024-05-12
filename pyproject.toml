@@ -19,10 +19,11 @@ dependencies = [
     "django-extensions==3.2.3",
     # STATIC FILES
     "whitenoise==6.5.0",
-    # TEMPLATING
-    "crispy-bootstrap5==0.7",
     # REQUESTS
     "requests==2.31.0",
+    # TEMPLATING
+    "django-crispy-forms==2.1",
+    "crispy-tailwind==1.0.3",
 ]
 
 [project.optional-dependencies]
