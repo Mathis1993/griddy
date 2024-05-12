@@ -6,28 +6,43 @@
 {% block title %}Registrierung{% endblock %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+<div class="flex flex-col md:justify-center md:w-1/2 mx-auto md:h-screen">
   <a href="#"
-     class="flex items-center mb-6 text-2xl font-semibold text-gray dark:text-white">
+     class="flex items-center justify-center mb-6 text-2xl font-semibold text-gray dark:text-white">
     <img class="w-8 h-8 mr-2"
          src="{% static 'images/griddy.webp' %}"
          alt="logo">
     Griddy
   </a>
-  <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-      <h1 class="text-xl font-bold md:text-2xl mb-3">Registrierung</h1>
-      <form method="post"
-            action="{% url 'users:signup' %}">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit"
-               value="Registrieren"
-               class="btn btn-primary w-full mt-3">
-        <input type="hidden"
-               name="next"
-               value="{{ next }}">
-      </form>
+  <div
+        class="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
+    <div class="p-4 sm:p-7">
+      <div class="text-center">
+        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Registrierung</h1>
+                <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+          Doch schon einen Account?
+          <a class="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
+             href="{% url 'users:login' %}">
+            Anmeldung
+          </a>
+        </p>
+      </div>
+      <div class="mt-5">
+        <!-- Form -->
+        <form method="post"
+              action="{% url 'users:signup' %}">
+          <div class="grid gap-y-4">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <!-- End Form Group -->
+            <button type="submit"
+                    class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+              Registrieren
+            </button>
+          </div>
+        </form>
+        <!-- End Form -->
+      </div>
     </div>
   </div>
 </div>
