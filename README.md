@@ -1,6 +1,9 @@
 # griddy
 Welcome to griddy - a simple django/tailwind project for controlling your heat pump to favor dynamic "Netzentgelte".
 
+## Docs
+See the `docs` directory in this repo and the `obsidian` vault backed up to [Mathis1993/obsidian](https://github.com/Mathis1993/obsidian).
+
 ## Stack
 This is a simple template for a django project using
 - `tailwind CSS`
