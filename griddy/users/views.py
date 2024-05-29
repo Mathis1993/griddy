@@ -34,7 +34,7 @@ def index(request: HttpRequest) -> HttpResponse:
         return redirect("admin:index")
 
     if user.is_user():
-        return redirect("home")
+        return redirect("devices:dashboard")
 
 
 class HomePageView(LoginRequiredMixin, TemplateView):

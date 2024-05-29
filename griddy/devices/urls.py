@@ -14,4 +14,5 @@ urlpatterns = [
         views.HeatPumpCreateView.as_view(),
         name="create_heat_pump",
     ),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
 ]
