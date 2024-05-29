@@ -1,5 +1,6 @@
 import factory.fuzzy
 from devices.models import DummyHeatPump
+from devices.models.heat_pumps import SmartthingsHeatPump
 
 
 class DummyHeatPumpFactory(factory.django.DjangoModelFactory):
@@ -14,11 +15,11 @@ class DummyHeatPumpFactory(factory.django.DjangoModelFactory):
 
 class SmartthingsHeatPumpFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = DummyHeatPump
+        model = SmartthingsHeatPump
         django_get_or_create = ("name",)
 
     name = factory.Sequence(lambda n: f"smartthings_heat_pump_{n}")
-    api_config = factory.SubFactory("external.tests.factories.ApiConfigFactory")
+    api_key = factory.SubFactory("external.tests.factories.ApiKeyFactory")
     smartthings_device_id = factory.Sequence(lambda n: f"smartthings_device_{n}")
     module_name_water = "main"
     module_name_heating = "INDOOR"
