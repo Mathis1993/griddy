@@ -16,6 +16,8 @@ class DeviceFactory(factory.django.DjangoModelFactory):
     manufacturer = factory.SubFactory("devices.tests.factories.ManufacturerFactory")
     content_type = None
     object_id = None
+    manual_mode = factory.fuzzy.FuzzyChoice([True, False])
+    time_profile_active = factory.fuzzy.FuzzyChoice([True, False])
 
     @classmethod
     def create(cls, **kwargs):
