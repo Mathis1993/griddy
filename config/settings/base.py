@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     # custom
     "core",
     "devices",
-    "execution_conditions",
     "external",
     "netzentgelte",
     "users",

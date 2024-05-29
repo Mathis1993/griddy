@@ -5,10 +5,6 @@ from devices.tests.factories.heat_pump_factories import SmartthingsHeatPumpFacto
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from execution_conditions.tests.factories import (
-    ExecutionConditionFactory,
-    GlobalSwitchHeatPumpFactory,
-)
 from external.tests.factories import ApiConfigFactory, ApiKeyFactory
 from netzentgelte.tests.factories import ZipCodeFactory
 
@@ -49,18 +45,10 @@ def _seed_database(smartthings_api_key: str, smartthings_device_id: str):
         default_flow_temperature_water=35,
         default_flow_temperature_heating=35,
     )
-    device = DeviceFactory.create(
+    DeviceFactory.create(
         name="wingst_device",
         user=user,
         address=address,
         manufacturer=manufacturer,
         specific_device=smartthings_heat_pump,
     )
-
-    global_switch = GlobalSwitchHeatPumpFactory.create(control_heat_pump=False)
-    execution_condition = ExecutionConditionFactory.create(
-        name="control_wingst_heat_pump",
-        user=user,
-        specific_condition=global_switch,
-    )
-    device.execution_conditions.add(execution_condition)
