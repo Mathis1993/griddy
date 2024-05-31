@@ -22,7 +22,7 @@ class MagnitudeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Magnitude
 
-    magnitude = factory.fuzzy.FuzzyChoice(Magnitude.Magnitude.choices.values)
+    magnitude = factory.fuzzy.FuzzyChoice(Magnitude.Magnitude.values)
 
 
 class ZipCodeFactory(factory.django.DjangoModelFactory):
