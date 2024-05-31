@@ -50,7 +50,7 @@ class Device(TrackCreationAndUpdates):
         if not self.time_profile_active:
             self.logger.info(f"Device {self} has no active time profile, skipping synchronization")
             return
-        time_profile = self.time_profiles.first(active=True)
+        time_profile = self.time_profiles.filter(active=True).first()
         self.content_object.synchronize_current_with_desired_state(time_profile)
 
 
