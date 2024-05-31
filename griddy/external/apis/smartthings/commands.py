@@ -1,6 +1,8 @@
 from external.apis.smartthings.exceptions import CommandModuleException
 
 FLOW_TEMPERATURE_COMMAND = "setCoolingSetpoint"
+ON_COMMAND = "on"
+OFF_COMMAND = "off"
 
 
 class Command:
@@ -40,3 +42,11 @@ class SetFlowTemperatureCommand(Command):
         args = [temperature]
         kwargs = {"module": module}
         return super().__call__(*args, **kwargs)
+
+
+class OnCommand(Command):
+    name = ON_COMMAND
+
+
+class OffCommand(Command):
+    name = OFF_COMMAND

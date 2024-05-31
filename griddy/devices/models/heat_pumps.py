@@ -5,7 +5,7 @@ from devices.models.time_control import TimeProfile
 from devices.models.utils import ExecutionResult
 from django.db import models
 from external.apis.smartthings.api import Api as SmartthingsApi
-from external.apis.smartthings.capabilities import FlowTemperatureCapability
+from external.apis.smartthings.capabilities import FlowTemperatureCapability, OnOffCapability
 from external.apis.smartthings.exceptions import SmartthingsApiException
 
 
@@ -141,10 +141,20 @@ class SmartthingsHeatPump(HeatPump):
             return ExecutionResult(success=False, message=str(e))
         return ExecutionResult(success=True, message=f"Set flow temperature to {temperature}°C")
 
-    def turn_off(self) -> ExecutionResult:
-        # ToDo(ME-31.05.24):
-        return ExecutionResult(success=True, message="Turned off")
-
     def turn_on(self) -> ExecutionResult:
-        # ToDo(ME-31.05.24):
+        command = OnOffCapability.turn_on(module=self.module_name)
+        try:
+            self.api.command(self.smartthings_device_id, command)
+        except SmartthingsApiException as e:
+            self.logger.error(f"Failed to turn on: {e}")
+            return ExecutionResult(success=False, message=str(e))
         return ExecutionResult(success=True, message="Turned on")
+
+    def turn_off(self) -> ExecutionResult:
+        command = OnOffCapability.turn_off(module=self.module_name)
+        try:
+            self.api.command(self.smartthings_device_id, command)
+        except SmartthingsApiException as e:
+            self.logger.error(f"Failed to turn off: {e}")
+            return ExecutionResult(success=False, message=str(e))
+        return ExecutionResult(success=True, message="Turned off")
