@@ -35,6 +35,9 @@ class HeatPump(SpecificDevice):
         raise NotImplementedError("Method turn_off must be implemented in subclass")
 
     def synchronize_current_with_desired_state(self, time_profile: TimeProfile):
+        if time_profile is None or not time_profile.active:
+            self.logger.info(f"No (active) time profile provided for heat pump {self}")
+            return
         time_slot = time_profile.get_current_time_slot()
         if not time_slot:
             self.logger.info(f"No time slot found for time profile {time_profile.name}")
@@ -120,8 +123,8 @@ class SmartthingsHeatPump(HeatPump):
     def status(self):
         return self.api.device_status(self.smartthings_device_id)
 
-    def online(self, module_name: str) -> bool:
-        return self.status["components"][module_name]["switch"]["switch"]["value"] == "on"
+    def online(self) -> bool:
+        return self.status["components"][self.module_name]["switch"]["switch"]["value"] == "on"
 
     def current_flow_temperature(self) -> int:
         return int(
