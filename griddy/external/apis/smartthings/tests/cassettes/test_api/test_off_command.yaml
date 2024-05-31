@@ -1,7 +1,7 @@
 interactions:
 - request:
-    body: '{"commands": [{"component": "INDOOR", "capability": "thermostatCoolingSetpoint",
-      "command": "setCoolingSetpoint", "arguments": [50]}]}'
+    body: '{"commands": [{"component": "INDOOR", "capability": "switch", "command":
+      "off", "arguments": []}]}'
     headers:
       Accept:
       - '*/*'
@@ -12,7 +12,7 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '134'
+      - '98'
       Content-Type:
       - application/json
       User-Agent:
@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 10 May 2024 11:26:24 GMT
+      - Fri, 31 May 2024 15:21:42 GMT
       Server:
       - openresty
       Transfer-Encoding:
@@ -44,7 +44,7 @@ interactions:
       X-RateLimit-Remaining:
       - '120'
       X-RateLimit-Reset:
-      - '35203'
+      - '17895'
       content-encoding:
       - gzip
     status:

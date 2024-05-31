@@ -4,6 +4,7 @@ from external.apis.smartthings.api import Api
 from external.apis.smartthings.capabilities import (
     FLOW_TEMPERATURE_CAPABILITY,
     FlowTemperatureCapability,
+    OnOffCapability,
 )
 from external.apis.smartthings.exceptions import SmartthingsApiException
 
@@ -51,7 +52,7 @@ def test_command(smartthings_api):
     response = smartthings_api.command(settings.TEST_SMARTTHINGS_DEVICE_ID, command)
 
     results = response["results"][0]
-    assert results["id"] == settings.TEST_SMARTTHINGS_DEVICE_ID
+    assert results["id"] == settings.TEST_SMARTTHINGS_COMMAND_ID
     assert results["status"] == "COMPLETED"
 
 
@@ -62,3 +63,27 @@ def test_process_response_bad_request(smartthings_api):
 
     with pytest.raises(SmartthingsApiException):
         smartthings_api.devices()
+
+
+@pytest.mark.vcr()
+@pytest.mark.block_network()
+def test_on_command(smartthings_api):
+    command = OnOffCapability.turn_on(module="INDOOR")
+
+    response = smartthings_api.command(settings.TEST_SMARTTHINGS_DEVICE_ID, command)
+
+    results = response["results"][0]
+    assert results["id"] == settings.TEST_SMARTTHINGS_COMMAND_ID
+    assert results["status"] == "COMPLETED"
+
+
+@pytest.mark.vcr()
+@pytest.mark.block_network()
+def test_off_command(smartthings_api):
+    command = OnOffCapability.turn_off(module="INDOOR")
+
+    response = smartthings_api.command(settings.TEST_SMARTTHINGS_DEVICE_ID, command)
+
+    results = response["results"][0]
+    assert results["id"] == settings.TEST_SMARTTHINGS_COMMAND_ID
+    assert results["status"] == "COMPLETED"

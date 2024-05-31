@@ -17,3 +17,4 @@ ALLOWED_HOSTS = ["localhost", "baby-yoda.local"]
 # Smartthings API (replace with actual values to record vcr cassettes)
 TEST_SMARTTHINGS_API_TOKEN = "test_token"
 TEST_SMARTTHINGS_DEVICE_ID = "test_device_id"
+TEST_SMARTTHINGS_COMMAND_ID = "test_command_id"

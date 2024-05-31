@@ -1,8 +1,12 @@
 import pytest
-from external.apis.smartthings.capabilities import FLOW_TEMPERATURE_CAPABILITY
+from external.apis.smartthings.capabilities import FLOW_TEMPERATURE_CAPABILITY, ON_OFF_CAPABILITY
 from external.apis.smartthings.commands import (
     FLOW_TEMPERATURE_COMMAND,
+    OFF_COMMAND,
+    ON_COMMAND,
     Command,
+    OffCommand,
+    OnCommand,
     SetFlowTemperatureCommand,
 )
 from external.apis.smartthings.exceptions import CommandModuleException
@@ -47,6 +51,62 @@ def test_flow_temperature_command():
                 "capability": FLOW_TEMPERATURE_CAPABILITY,
                 "command": FLOW_TEMPERATURE_COMMAND,
                 "arguments": ["35"],
+            }
+        ]
+    }
+
+
+def test_on_command():
+    command = OnCommand(capability_name=ON_OFF_CAPABILITY)
+
+    assert command.name == ON_COMMAND
+    assert command.to_dict() == {
+        "commands": [
+            {
+                "component": None,
+                "capability": ON_OFF_CAPABILITY,
+                "command": ON_COMMAND,
+                "arguments": [],
+            }
+        ]
+    }
+
+    command_with_module = command(module="main")
+    assert command_with_module.to_dict() == {
+        "commands": [
+            {
+                "component": "main",
+                "capability": ON_OFF_CAPABILITY,
+                "command": ON_COMMAND,
+                "arguments": [],
+            }
+        ]
+    }
+
+
+def test_off_command():
+    command = OffCommand(capability_name=ON_OFF_CAPABILITY)
+
+    assert command.name == OFF_COMMAND
+    assert command.to_dict() == {
+        "commands": [
+            {
+                "component": None,
+                "capability": ON_OFF_CAPABILITY,
+                "command": OFF_COMMAND,
+                "arguments": [],
+            }
+        ]
+    }
+
+    command_with_module = command(module="main")
+    assert command_with_module.to_dict() == {
+        "commands": [
+            {
+                "component": "main",
+                "capability": ON_OFF_CAPABILITY,
+                "command": OFF_COMMAND,
+                "arguments": [],
             }
         ]
     }
