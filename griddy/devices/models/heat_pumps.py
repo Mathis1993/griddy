@@ -1,10 +1,12 @@
 import logging
 
-from devices.models.base_models import Action, SpecificDevice
+from devices.models.base_models import SpecificDevice
 from devices.models.time_control import TimeProfile
+from devices.models.utils import ExecutionResult
 from django.db import models
 from external.apis.smartthings.api import Api as SmartthingsApi
 from external.apis.smartthings.capabilities import FlowTemperatureCapability
+from external.apis.smartthings.exceptions import SmartthingsApiException
 
 
 class HeatPump(SpecificDevice):
@@ -23,8 +25,14 @@ class HeatPump(SpecificDevice):
     def current_flow_temperature(self, *args, **kwargs) -> int:
         raise NotImplementedError("Method current_flow_temperature must be implemented in subclass")
 
-    def set_flow_temperature(self, temperature: int, *args, **kwargs) -> bool:
+    def set_flow_temperature(self, temperature: int, *args, **kwargs) -> ExecutionResult:
         raise NotImplementedError("Method set_flow_temperature must be implemented in subclass")
+
+    def turn_on(self) -> ExecutionResult:
+        raise NotImplementedError("Method turn_on must be implemented in subclass")
+
+    def turn_off(self) -> ExecutionResult:
+        raise NotImplementedError("Method turn_off must be implemented in subclass")
 
     def synchronize_current_with_desired_state(self, time_profile: TimeProfile):
         time_slot = time_profile.get_current_time_slot()
@@ -64,36 +72,38 @@ class DummyHeatPump(HeatPump):
     name = models.CharField(max_length=255)
     some_config_value = models.CharField(max_length=255)
 
-    actions = {
-        Action.ActionType.TURN_ON: "turn_on",
-        Action.ActionType.TURN_OFF: "turn_off",
-    }
-
     @classmethod
     def get_integration_name(cls):
         return "Dummy"
 
-    def turn_on(self):
-        return f"Turning on {self.name}"
+    def turn_on(self) -> ExecutionResult:
+        return ExecutionResult(success=True, message="Turned on")
 
-    def turn_off(self):
-        return f"Turning off {self.name}"
+    def turn_off(self) -> ExecutionResult:
+        return ExecutionResult(success=True, message="Turned off")
+
+    def online(self, *args, **kwargs) -> bool:
+        return True
+
+    def current_flow_temperature(self, *args, **kwargs) -> int:
+        return 50
+
+    def set_flow_temperature(self, temperature: int, *args, **kwargs) -> ExecutionResult:
+        return ExecutionResult(success=True, message=f"Set flow temperature to {temperature}°C")
 
 
 class SmartthingsHeatPump(HeatPump):
     class Meta:
         db_table = "devices_smartthings_heat_pumps"
 
+    class Module(models.TextChoices):
+        WATER = "main"
+        HEATING = "INDOOR"
+
     name = models.CharField(max_length=255)
     smartthings_device_id = models.CharField(max_length=511)
-    module_name_water = models.CharField(max_length=255)
-    module_name_heating = models.CharField(max_length=255)
-    default_flow_temperature_water = models.IntegerField()
-    default_flow_temperature_heating = models.IntegerField()
-
-    actions = {
-        Action.ActionType.SET_FLOW_TEMPERATURE: "set_flow_temperature",
-    }
+    module_name = models.CharField(max_length=255, choices=Module.choices)
+    default_flow_temperature = models.IntegerField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -113,13 +123,28 @@ class SmartthingsHeatPump(HeatPump):
     def online(self, module_name: str) -> bool:
         return self.status["components"][module_name]["switch"]["switch"]["value"] == "on"
 
-    def current_flow_temperature(self, module_name: str) -> int:
+    def current_flow_temperature(self) -> int:
         return int(
-            self.status["components"][module_name]["thermostatCoolingSetpoint"]["coolingSetpoint"][
-                "value"
-            ]
+            self.status["components"][self.module_name]["thermostatCoolingSetpoint"][
+                "coolingSetpoint"
+            ]["value"]
         )
 
-    def set_flow_temperature(self, temperature: int, module: str):
-        command = FlowTemperatureCapability.set_flow_temperature(temperature, module=module)
-        self.api.command(self.smartthings_device_id, command)
+    def set_flow_temperature(self, temperature: int, *args, **kwargs) -> ExecutionResult:
+        command = FlowTemperatureCapability.set_flow_temperature(
+            temperature, module=self.module_name
+        )
+        try:
+            self.api.command(self.smartthings_device_id, command)
+        except SmartthingsApiException as e:
+            self.logger.error(f"Failed to set flow temperature to {temperature}°C: {e}")
+            return ExecutionResult(success=False, message=str(e))
+        return ExecutionResult(success=True, message=f"Set flow temperature to {temperature}°C")
+
+    def turn_off(self) -> ExecutionResult:
+        # ToDo(ME-31.05.24):
+        return ExecutionResult(success=True, message="Turned off")
+
+    def turn_on(self) -> ExecutionResult:
+        # ToDo(ME-31.05.24):
+        return ExecutionResult(success=True, message="Turned on")

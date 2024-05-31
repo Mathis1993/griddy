@@ -1,9 +1,6 @@
-from datetime import timedelta
-
 import factory.fuzzy
-from devices.models import Action, Address, Command, Device, Manufacturer
+from devices.models import Address, Device, Manufacturer
 from django.contrib.contenttypes.models import ContentType
-from django.utils import timezone
 
 
 class DeviceFactory(factory.django.DjangoModelFactory):
@@ -47,23 +44,3 @@ class AddressFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("zip_code",)
 
     zip_code = factory.SubFactory("netzentgelte.tests.factories.ZipCodeFactory")
-
-
-class CommandFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Command
-
-    execution_time = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.now(), end_dt=timezone.now() + timedelta(days=1)
-    )
-    execution_status = factory.fuzzy.FuzzyChoice(Command.ExecutionStatus.values)
-    action = factory.SubFactory("devices.tests.factories.ActionFactory")
-
-
-class ActionFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Action
-
-    device = factory.SubFactory("devices.tests.factories.DeviceFactory")
-    type = factory.fuzzy.FuzzyChoice(Action.ActionType.values)
-    parameters = None

@@ -1,9 +1,7 @@
 import logging
-from typing import Dict
 
 from core.models import TrackCreationAndUpdates
 from devices.models.time_control import TimeProfile
-from devices.models.utils import ExecutionResult
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -72,79 +70,6 @@ class Address(TrackCreationAndUpdates):
     )
 
 
-class Command(TrackCreationAndUpdates):
-    class Meta:
-        db_table = "devices_commands"
-
-    class ExecutionStatus(models.TextChoices):
-        WAITING = "waiting"
-        QUEUED = "queued"
-        DECLINED = "declined"
-        EXECUTED = "executed"
-
-    execution_time = models.DateTimeField()
-    execution_status = models.CharField(choices=ExecutionStatus.choices, max_length=255)
-    action = models.ForeignKey(
-        to="devices.Action", on_delete=models.RESTRICT, related_name="commands"
-    )
-
-    def execute(self) -> ExecutionResult:
-        execution_result = self.action.execute()
-        if execution_result.success:
-            self.execution_status = Command.ExecutionStatus.EXECUTED
-        else:
-            CommandLog.objects.create(
-                command=self,
-                message=execution_result.message,
-            )
-            self.execution_status = Command.ExecutionStatus.DECLINED
-        self.save()
-        return execution_result
-
-
-# ToDo(ME-29.05.24): This is overkill, isn't it?
-#  Every heat pump must implement say `set_current_flow_temperature`, `turn_on` and `turn_off`
-#  and that's it
-class Action(TrackCreationAndUpdates):
-    class Meta:
-        db_table = "devices_actions"
-        unique_together = ["device", "type"]
-
-    class ActionType(models.TextChoices):
-        TURN_ON = "turn_on"
-        TURN_OFF = "turn_off"
-        SET_FLOW_TEMPERATURE = "set_flow_temperature"
-
-    device = models.ForeignKey(
-        to="devices.Device", on_delete=models.CASCADE, related_name="actions"
-    )
-    type = models.CharField(choices=ActionType.choices, max_length=255)
-    parameters = models.JSONField(null=True, blank=True, default=None)
-
-    def execute(self) -> ExecutionResult:
-        return self._execute()
-
-    def _execute(self) -> ExecutionResult:
-        device = self.device
-        action_method_name = device.content_object.actions.get(self.type)
-        if not action_method_name:
-            raise NotImplementedError(
-                f"Action {self.type} ({self.pk}) not supported "
-                f"by device {device.name} ({device.pk})"
-            )
-        action_method = getattr(device.content_object, action_method_name)
-        result = action_method()
-        return ExecutionResult(success=True, message="Execution successful", result=result)
-
-
-class CommandLog(TrackCreationAndUpdates):
-    class Meta:
-        db_table = "devices_commands_logs"
-
-    command = models.ForeignKey(to="devices.Command", on_delete=models.CASCADE, related_name="logs")
-    message = models.TextField()
-
-
 class SpecificDevice(TrackCreationAndUpdates):
     class Meta:
         abstract = True
@@ -153,13 +78,6 @@ class SpecificDevice(TrackCreationAndUpdates):
     api_key = models.ForeignKey(
         to="external.ApiKey", on_delete=models.RESTRICT, related_name="%(app_label)s_%(class)s"
     )
-
-    @property
-    def actions(self) -> Dict[Action.ActionType, str]:
-        raise NotImplementedError("actions property not implemented")
-
-    def register_actions(self, device_id: int):
-        [Action.objects.get_or_create(device_id=device_id, type=action) for action in self.actions]
 
     def online(self, *args, **kwargs) -> bool:
         raise NotImplementedError("Method online must be implemented in subclass")
