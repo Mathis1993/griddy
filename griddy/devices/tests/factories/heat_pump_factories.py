@@ -21,5 +21,5 @@ class SmartthingsHeatPumpFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: f"smartthings_heat_pump_{n}")
     api_key = factory.SubFactory("external.tests.factories.ApiKeyFactory")
     smartthings_device_id = factory.Sequence(lambda n: f"smartthings_device_{n}")
-    module_name = factory.fuzzy.FuzzyChoice(SmartthingsHeatPump.Module.choices)
+    module_name = factory.fuzzy.FuzzyChoice(SmartthingsHeatPump.Module.values)
     default_flow_temperature = factory.fuzzy.FuzzyInteger(low=30, high=70)

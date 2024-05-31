@@ -48,8 +48,7 @@ def _seed_database(smartthings_api_key: str, smartthings_device_id: str):
         name="wingst_heat_pump",
         api_key=api_key,
         smartthings_device_id=smartthings_device_id,
-        default_flow_temperature_water=35,
-        default_flow_temperature_heating=35,
+        default_flow_temperature=35,
     )
     device = DeviceFactory.create(
         name="wingst_device",
@@ -77,7 +76,7 @@ def _seed_database(smartthings_api_key: str, smartthings_device_id: str):
     time_slot = TimeSlotFactory.create(
         time_profile=time_profile,
         start=now.time(),
-        end=now.time() + timedelta(hours=2),
+        end=(now + timedelta(hours=2)).time(),
     )
     TimeSlotTargetValueFactory.create(
         time_slot=time_slot,
