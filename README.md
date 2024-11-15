@@ -1,5 +1,5 @@
 # griddy
-Welcome to griddy - a simple django/tailwind project for controlling your heat pump to favor dynamic "Netzentgelte".
+Welcome to griddy - a simple django/tailwind project for calculating the effect of switching to a dynamic electricity rate based on somebody's specific personal situation.
 
 ## Docs
 See the `docs` directory in this repo and the `obsidian` vault backed up to [Mathis1993/obsidian](https://github.com/Mathis1993/obsidian).
