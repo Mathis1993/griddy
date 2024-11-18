@@ -18,13 +18,14 @@
         href="{% static 'images/favicon.ico' %}">
 
   {% block css %}
-  <link rel="stylesheet"
-        href="{% static 'css/output.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/output.css' %}">
   {% endblock %}
 </head>
 
 <body class="bg-base-200">
-<main id="main" class="container mx-auto px-4 py-6">
+<main id="main"
+      class="container mx-auto px-4 py-6">
   {% include "_csrf.html" %}
   {% block nav %}
     {% include "_nav.html" %}
@@ -43,10 +44,12 @@
 </footer>
 
 {% block javascript %}
-<!-- Preline JS -->
-<script src="{% static 'js/vendored/main.js' %}"></script>
-<!-- Project JS -->
-<script src="{% static 'js/base.js' %}"></script>
+  <!-- HTMX -->
+  <script defer src="{% static 'js/htmx.min.js' %}"></script>
+  <!-- Preline JS -->
+  <script src="{% static 'js/vendored/main.js' %}"></script>
+  <!-- Project JS -->
+  <script src="{% static 'js/base.js' %}"></script>
 
 {% endblock javascript %}
 
