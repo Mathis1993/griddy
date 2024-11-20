@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-      "../griddy/templates/**/*.html",
+      "../griddy/**/*.html",
       "../griddy/static/js/**/*.js",
       "./node_modules/preline/dist/*.js",
   ],
