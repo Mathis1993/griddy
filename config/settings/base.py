@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # custom
     "core",
     "electricity_rates",
+    "external",
     # third-party
     "django_extensions",
     "crispy_forms",
@@ -120,8 +121,9 @@ TIME_ZONE = "Europe/Berlin"
 
 USE_I18N = True
 
-# django.utils.timezone.now() will return tz-aware datetime objects (in UTC)
-USE_TZ = True
+# True: django.utils.timezone.now() will return tz-aware datetime objects (in UTC)
+# False: django.utils.timezone.now() will return tz-unaware datetime objects
+USE_TZ = False
 
 # Directory for storing translation files
 # Run python manage.py makemessages -l de to create translation files

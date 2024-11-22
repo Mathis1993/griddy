@@ -51,6 +51,7 @@ class ZipCodeView(FormView):
     }
 
     def get(self, request, *args, **kwargs):
+        # ToDo(ME-22.11.24): Handle full page reload somewhere during the form process
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):

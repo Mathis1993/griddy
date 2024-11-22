@@ -4,7 +4,6 @@ to avoid code duplication.
 """
 
 import pytest
-from users.tests.factories import UserFactory
 
 
 @pytest.fixture
@@ -18,11 +17,6 @@ def create_response(client):
         return response
 
     return _create_response
-
-
-@pytest.fixture
-def user():
-    return UserFactory.create()
 
 
 @pytest.fixture
