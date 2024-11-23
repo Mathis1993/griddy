@@ -34,14 +34,23 @@ class SpotPriceHourly(SpotPrice):
     @classmethod
     def import_prices(cls, start: date, end: date):
         # already imported
-        if cls.objects.filter(at__range=[start, end]).exists():
+        already_existing_in_range = cls.objects.filter(at__range=[start, end]).order_by("at")
+        actual_start = already_existing_in_range.last() if already_existing_in_range.exists() else start
+        if start == end:
             logger.info("Spot prices already imported")
             return
 
-        logger.info(f"Importing spot prices from {start} to {end}")
+        # if cls.objects.filter(at__range=[start, end]).exists():
+        #     logger.info("Spot prices already imported")
+        #     return
+
+        if already_existing_in_range.exists():
+            logger.info(f"Importing spot prices from {actual_start} to {end} (already imported until {actual_start})")
+        else:
+            logger.info(f"Importing spot prices from {actual_start} to {end}")
 
         energy_charts_api = EnergyChartsApi()
-        data = energy_charts_api.get_spot_prices(start, end)
+        data = energy_charts_api.get_spot_prices(actual_start, end)
 
         objs = [cls(
             price=price,
@@ -52,6 +61,12 @@ class SpotPriceHourly(SpotPrice):
                                       )]
         cls.objects.bulk_create(objs)
 
+    @classmethod
+    def import_prices_last_year(cls):
+        end = date.today() - timedelta(days=1)
+        start = end - timedelta(days=365)
+        cls.import_prices(start, end)
+
 
 class SpotPriceAverageLastYear(SpotPrice):
     class Meta:
@@ -61,23 +76,25 @@ class SpotPriceAverageLastYear(SpotPrice):
 
     @classmethod
     def compute_and_store_average_last_year_from_today(cls):
-        if cls.objects.filter(at=date.today()).exists():
+        today = date.today()
+        if cls.objects.filter(at=today).exists():
             logger.info("Average already computed")
             return
 
-        start = date.today() - timedelta(days=1)
-        end = start - timedelta(days=365)
+        end = date.today() - timedelta(days=1)
+        start = end - timedelta(days=365)
 
-        if not SpotPriceHourly.objects.filter(at__range=[end, start]).exists():
-            raise ValueError("SpotPriceHourly data is missing")
+        if not SpotPriceHourly.objects.filter(at=start).exists() or not SpotPriceHourly.objects.filter(at=end).exists():
+            logger.info("Spot price data is missing, attempting to import")
+            SpotPriceHourly.import_prices_last_year()
 
         logger.info(f"Computing average spot price from last year (using data from {start} to {end})")
 
-        average = SpotPriceHourly.objects.filter(at__range=[end, start]).aggregate(models.Avg("price"))["price__avg"]
+        average = SpotPriceHourly.objects.filter(at__range=[start, end]).aggregate(models.Avg("price"))["price__avg"]
 
         cls.objects.create(
             price=average,
-            at=start,
+            at=today,
             electricity_unit=cls.ElectricityUnit.MEGAWATT_HOUR,
             currency_unit=cls.CurrencyUnit.EURO,
         )

@@ -9,6 +9,7 @@ import os
 import sys
 from pathlib import Path
 
+from django.contrib import messages
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -172,3 +173,12 @@ EMAIL_USE_TLS = True
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_TEMPLATE_PACK = "tailwind"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+
+# Messages
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+CONFETTI_MESSAGE_LEVEL = 26
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+    CONFETTI_MESSAGE_LEVEL: "success",
+}

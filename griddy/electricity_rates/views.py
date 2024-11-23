@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponse
 from django.views.generic import FormView
 
@@ -8,6 +10,7 @@ from electricity_rates.forms import (
     BasicFeeMonthlyStaticForm, KilowattHoursLastYearStaticForm, ElectricCarForm, ElectricCarKilowattHoursForm,
 )
 from electricity_rates.forms import ZipCodeForm
+from electricity_rates.models import BasicInput, ZipCode
 
 
 class ZipCodeView(FormView):
@@ -73,10 +76,16 @@ class ZipCodeView(FormView):
         self.store_response(form)
         next_step = self.get_next_step()
         if not next_step:
-            return self.handle_completion()
-
-        self.template_name = next_step.template_name
-        self.form_class = next_step.form_class
+            self.handle_completion()
+            messages.add_message(
+                self.request,
+                settings.CONFETTI_MESSAGE_LEVEL,
+                "Dein Ergebnis wurde berechnet!",
+            )
+            self.template_name = "result.html"
+        else:
+            self.template_name = next_step.template_name
+            self.form_class = next_step.form_class
         return self.render_to_response(self.get_context_data(form=self.form_class()))
 
     def get_current_step(self):
@@ -104,5 +113,29 @@ class ZipCodeView(FormView):
     def handle_completion(self):
         form_responses = self.request.session["form_progress"]["responses"]
         print(form_responses)
+        self.process_form_responses(form_responses)
         del self.request.session["form_progress"]
-        return HttpResponse("Form completed")
+
+    @staticmethod
+    # ToDo(ME-22.11.24): Move logic somewhere else?
+    def process_form_responses(form_responses):
+        zip_code = form_responses["zip_code"]["zip_code"]
+        zip_code = ZipCode.objects.get(zip_code=zip_code)
+        form_data = {
+            "zip_code": zip_code,
+            "network_operator_id": form_responses["network_operator"]["network_operator"],
+            "basic_fee_monthly_static": form_responses["basic_fee_monthly_static"]["basic_fee_monthly_static"],
+            "kilowatt_hour_rate_static": form_responses["kilowatt_hour_rate_static"]["kilowatt_hour_rate_static"],
+            "kilowatt_hours_last_year_static": form_responses["kilowatt_hours_last_year_static"]["kilowatt_hours_last_year_static"],
+            "electric_car": form_responses["electric_car"]["electric_car"],
+            "electric_car_kilowatt_hours": form_responses.get("electric_car_kilowatt_hours", {}).get("electric_car_kilowatt_hours"),
+        }
+        basic_input = BasicInput(**form_data)
+        basic_input.calculate_electricity_costs_last_year_static()
+        basic_input.calculate_electricity_costs_last_year_dynamic()
+        basic_input.save()
+
+
+
+
+

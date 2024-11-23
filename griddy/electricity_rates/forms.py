@@ -3,10 +3,9 @@ from typing import Type, Union, Optional, Callable
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms.widgets import ChoiceWidget
 
 from core.forms import JsonSerializableForm, JsonSerializableModelForm, StyledCharField, StyledIntegerField, \
-    StyledBooleanField, CustomSelectWidget, CustomCheckBoxWidget, CustomChoiceField
+    CustomSelectWidget, CustomChoiceField
 from electricity_rates.models import ZipCode, NetworkOperator
 
 
@@ -56,7 +55,8 @@ class KilowattHoursLastYearStaticForm(JsonSerializableForm):
 
 
 class ElectricCarForm(JsonSerializableForm):
-    electric_car = CustomChoiceField(label="Elektroauto vorhanden?", required=True, choices=((True, "Ja"), (False, "Nein")))
+    electric_car = CustomChoiceField(label="Elektroauto vorhanden?", required=True,
+                                     choices=((True, "Ja"), (False, "Nein")))
 
 
 class ElectricCarKilowattHoursForm(JsonSerializableForm):
