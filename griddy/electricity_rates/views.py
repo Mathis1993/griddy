@@ -76,13 +76,18 @@ class ZipCodeView(FormView):
         self.store_response(form)
         next_step = self.get_next_step()
         if not next_step:
-            self.handle_completion()
+            result_data = self.handle_completion()
+            self.template_name = "result.html"
+            context = self.get_context_data()
+            context["basic_input"] = result_data.get("basic_input")
+            context["savings"] = result_data.get("savings")
+            context["positive_savings"] = result_data.get("positive_savings")
             messages.add_message(
                 self.request,
-                settings.CONFETTI_MESSAGE_LEVEL,
+                settings.CONFETTI_MESSAGE_LEVEL if context["positive_savings"] else messages.SUCCESS,
                 "Dein Ergebnis wurde berechnet!",
             )
-            self.template_name = "result.html"
+            return self.render_to_response(context)
         else:
             self.template_name = next_step.template_name
             self.form_class = next_step.form_class
@@ -113,8 +118,9 @@ class ZipCodeView(FormView):
     def handle_completion(self):
         form_responses = self.request.session["form_progress"]["responses"]
         print(form_responses)
-        self.process_form_responses(form_responses)
+        result_data = self.process_form_responses(form_responses)
         del self.request.session["form_progress"]
+        return result_data
 
     @staticmethod
     # ToDo(ME-22.11.24): Move logic somewhere else?
@@ -134,6 +140,12 @@ class ZipCodeView(FormView):
         basic_input.calculate_electricity_costs_last_year_static()
         basic_input.calculate_electricity_costs_last_year_dynamic()
         basic_input.save()
+        savings, positive_savings = basic_input.calculate_potential_savings()
+        return {
+            "basic_input": basic_input,
+            "savings": savings,
+            "positive_savings": positive_savings,
+        }
 
 
 

@@ -29,7 +29,7 @@ class BasicInput(TrackCreationAndUpdates):
             return
         if self.kilowatt_hour_rate_static is None or self.basic_fee_monthly_static is None:
             raise ValueError("Need basic fee and kilowatt hour rate")
-        self.electricity_costs_last_year_static = ((self.kilowatt_hour_rate_static * self.kilowatt_hours_last_year_static)/100) + (self.basic_fee_monthly_static * 12)
+        self.electricity_costs_last_year_static = round(((self.kilowatt_hour_rate_static * self.kilowatt_hours_last_year_static)/100) + (self.basic_fee_monthly_static * 12), 2)
 
     def calculate_electricity_costs_last_year_dynamic(self):
         if self.electricity_costs_last_year_dynamic is not None:
@@ -41,8 +41,11 @@ class BasicInput(TrackCreationAndUpdates):
             average_spot_price_last_year = SpotPriceAverageLastYear.objects.filter(at=date.today())
 
         # ToDo(ME-23.11.24): What do we use as basic monthly fee?
-        self.electricity_costs_last_year_dynamic = (((average_spot_price_last_year.first().price/10)/100) * self.kilowatt_hours_last_year_static) + (6 * 12)
+        self.electricity_costs_last_year_dynamic = round((((average_spot_price_last_year.first().price/10)/100) * self.kilowatt_hours_last_year_static) + (6 * 12), 2)
 
+    def calculate_potential_savings(self):
+        savings = round(float(self.electricity_costs_last_year_static) - float(self.electricity_costs_last_year_dynamic), 2)
+        return savings, savings > 0
 
 
 class ZipCode(TrackCreationAndUpdates):

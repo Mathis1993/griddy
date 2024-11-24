@@ -35,7 +35,7 @@ class SpotPriceHourly(SpotPrice):
     def import_prices(cls, start: date, end: date):
         # already imported
         already_existing_in_range = cls.objects.filter(at__range=[start, end]).order_by("at")
-        actual_start = already_existing_in_range.last() if already_existing_in_range.exists() else start
+        actual_start = already_existing_in_range.last().at if already_existing_in_range.exists() else start
         if start == end:
             logger.info("Spot prices already imported")
             return

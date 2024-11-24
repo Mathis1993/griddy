@@ -1,12 +1,14 @@
+<div id="messages" hx-swap-oob="true">
 {% for message in messages %}
-{#  ToDo: Convert to tailwind#}
-  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-      {{ message | safe }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <div class="flex items-center justify-between p-4 mb-4 border rounded-lg {% if message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 border-yellow-400 text-yellow-700{% elif message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% endif %}" role="alert">
+    <div class="flex-1">{{ message | safe }}</div>
+    <div class="pl-4">
+      <button class="text-2xl leading-none hover:opacity-75" onclick="this.closest('[role=alert]').remove()">×</button>
+    </div>
   </div>
-  {# CONFETTI #}
+
   {% if message.level == 26 %}
     {% include 'confetti.html' %}
   {% endif %}
-  {# /CONFETTI #}
 {% endfor %}
+</div>
