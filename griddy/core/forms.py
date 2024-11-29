@@ -12,9 +12,11 @@ class JsonSerializableForm(forms.Form):
 
     def to_dict(self):
         dict_data = {
-            field: self.cleaned_data[field]
-            if not isinstance(self.cleaned_data[field], models.Model)
-            else self.cleaned_data[field].pk
+            field: (
+                self.cleaned_data[field]
+                if not isinstance(self.cleaned_data[field], models.Model)
+                else self.cleaned_data[field].pk
+            )
             for field in self.cleaned_data
         }
         return dict_data
@@ -26,21 +28,31 @@ class JsonSerializableModelForm(forms.ModelForm):
 
     def to_dict(self):
         dict_data = {
-            field: self.cleaned_data[field]
-            if not isinstance(self.cleaned_data[field], models.Model)
-            else self.cleaned_data[field].pk
+            field: (
+                self.cleaned_data[field]
+                if not isinstance(self.cleaned_data[field], models.Model)
+                else self.cleaned_data[field].pk
+            )
             for field in self.cleaned_data
         }
         return dict_data
 
 
+class PreviousResponsesMixin:
+    def __init__(self, *args, **kwargs):
+        self.previous_responses = kwargs.pop("previous_responses", {})
+        super().__init__(*args, **kwargs)
+
+
 class StyledFieldMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.widget.attrs.update({
-            "class": STYLED_FORM_CLASSES,
-            "placeholder": f"{self.label}",
-        })
+        self.widget.attrs.update(
+            {
+                "class": STYLED_FORM_CLASSES,
+                "placeholder": f"{self.label}",
+            }
+        )
 
 
 class StyledCharField(StyledFieldMixin, forms.CharField):
