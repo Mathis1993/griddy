@@ -12,7 +12,6 @@ from core.forms import (
 )
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import QuerySet
 from electric_cars.models import Car
 from electricity_rates.models import NetworkOperator, ZipCode
 
