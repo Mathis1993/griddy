@@ -1,16 +1,18 @@
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponse
 from django.views.generic import FormView
-
+from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
+    BasicFeeMonthlyStaticForm,
+    ElectricCarExistsForm,
+    ElectricCarForm,
     FlowStep,
-    NetworkOperatorForm,
     KilowattHourRateStaticForm,
-    BasicFeeMonthlyStaticForm, KilowattHoursLastYearStaticForm, ElectricCarForm, ElectricCarKilowattHoursForm,
+    KilowattHoursLastYearStaticForm,
+    NetworkOperatorForm,
+    ZipCodeForm,
 )
-from electricity_rates.forms import ZipCodeForm
-from electricity_rates.models import BasicInput, ZipCode
+from electricity_rates.models import BasicInput, NetworkOperator, ZipCode
 
 
 class ZipCodeView(FormView):
@@ -20,7 +22,13 @@ class ZipCodeView(FormView):
         "zip_code": FlowStep(
             form_class=ZipCodeForm,
             template_name="zip_code.html",
-            next=lambda _: "network_operator",
+            next=lambda responses: (
+                "basic_fee_monthly_static"
+                if ZipCode.objects.get(
+                    zip_code=responses["zip_code"]["zip_code"]
+                ).one_to_one_network_operator()
+                else "network_operator"
+            ),
         ),
         "network_operator": FlowStep(
             form_class=NetworkOperatorForm,
@@ -30,26 +38,31 @@ class ZipCodeView(FormView):
         "basic_fee_monthly_static": FlowStep(
             form_class=BasicFeeMonthlyStaticForm,
             template_name="basic_fee_monthly_static.html",
-            next=lambda _: "kilowatt_hour_rate_static"
+            next=lambda _: "kilowatt_hour_rate_static",
         ),
         "kilowatt_hour_rate_static": FlowStep(
             form_class=KilowattHourRateStaticForm,
             template_name="kilowatt_hour_rate_static.html",
-            next=lambda _: "kilowatt_hours_last_year_static"
+            next=lambda _: "kilowatt_hours_last_year_static",
         ),
         "kilowatt_hours_last_year_static": FlowStep(
             form_class=KilowattHoursLastYearStaticForm,
             template_name="kilowatt_hours_last_year_static.html",
-            next=lambda _: "electric_car",
+            next=lambda _: "electric_car_exists",
         ),
+        "electric_car_exists": FlowStep(
+            form_class=ElectricCarExistsForm,
+            template_name="electric_car_exists.html",
+            next=lambda responses: (
+                "electric_car"
+                if responses["electric_car_exists"]["electric_car_exists"] == "True"
+                else None
+            ),
+        ),
+        # ToDo(ME-29.11.24): Option to add multiple electric cars
         "electric_car": FlowStep(
             form_class=ElectricCarForm,
             template_name="electric_car.html",
-            next=lambda responses: "electric_car_kilowatt_hours" if responses["electric_car"]["electric_car"] == "True" else None,
-        ),
-        "electric_car_kilowatt_hours": FlowStep(
-            form_class=ElectricCarKilowattHoursForm,
-            template_name="electric_car_kilowatt_hours.html",
         ),
     }
 
@@ -57,12 +70,16 @@ class ZipCodeView(FormView):
         # ToDo(ME-22.11.24): Handle full page reload somewhere during the form process
         return super().get(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["previous_responses"] = self.request.session.get("form_progress", {}).get(
+            "responses"
+        )
+        return form_kwargs
+
     def post(self, request, *args, **kwargs):
         if "form_progress" not in self.request.session:
-            self.request.session["form_progress"] = {
-                "current_step": "zip_code",
-                "responses": {}
-            }
+            self.request.session["form_progress"] = {"current_step": "zip_code", "responses": {}}
 
         current_step = self.get_current_step()
         self.template_name = current_step.template_name
@@ -84,7 +101,11 @@ class ZipCodeView(FormView):
             context["positive_savings"] = result_data.get("positive_savings")
             messages.add_message(
                 self.request,
-                settings.CONFETTI_MESSAGE_LEVEL if context["positive_savings"] else messages.SUCCESS,
+                (
+                    settings.CONFETTI_MESSAGE_LEVEL
+                    if context["positive_savings"]
+                    else messages.SUCCESS
+                ),
                 "Dein Ergebnis wurde berechnet!",
             )
             return self.render_to_response(context)
@@ -100,7 +121,9 @@ class ZipCodeView(FormView):
         return self.request.session["form_progress"]["current_step"]
 
     def store_response(self, form):
-        self.request.session["form_progress"]["responses"][self.get_current_step_key()] = form.to_dict()
+        self.request.session["form_progress"]["responses"][
+            self.get_current_step_key()
+        ] = form.to_dict()
 
     def get_next_step(self):
         current_step = self.get_current_step()
@@ -127,27 +150,36 @@ class ZipCodeView(FormView):
     def process_form_responses(form_responses):
         zip_code = form_responses["zip_code"]["zip_code"]
         zip_code = ZipCode.objects.get(zip_code=zip_code)
+        network_operator_id = form_responses.get("network_operator", {}).get(
+            "network_operator",
+            (
+                network_operator.id
+                if (network_operator := NetworkOperator.objects.filter(zip_code=zip_code).first())
+                else None
+            ),
+        )
+        electric_car_id = form_responses.get("electric_car", {}).get("electric_car")
         form_data = {
             "zip_code": zip_code,
-            "network_operator_id": form_responses["network_operator"]["network_operator"],
-            "basic_fee_monthly_static": form_responses["basic_fee_monthly_static"]["basic_fee_monthly_static"],
-            "kilowatt_hour_rate_static": form_responses["kilowatt_hour_rate_static"]["kilowatt_hour_rate_static"],
-            "kilowatt_hours_last_year_static": form_responses["kilowatt_hours_last_year_static"]["kilowatt_hours_last_year_static"],
-            "electric_car": form_responses["electric_car"]["electric_car"],
-            "electric_car_kilowatt_hours": form_responses.get("electric_car_kilowatt_hours", {}).get("electric_car_kilowatt_hours"),
+            "network_operator_id": network_operator_id,
+            "basic_fee_monthly_static": form_responses["basic_fee_monthly_static"][
+                "basic_fee_monthly_static"
+            ],
+            "kilowatt_hour_rate_static": form_responses["kilowatt_hour_rate_static"][
+                "kilowatt_hour_rate_static"
+            ],
+            "kilowatt_hours_last_year_static": form_responses["kilowatt_hours_last_year_static"][
+                "kilowatt_hours_last_year_static"
+            ],
+            "electric_car_id": electric_car_id,
         }
         basic_input = BasicInput(**form_data)
-        basic_input.calculate_electricity_costs_last_year_static()
-        basic_input.calculate_electricity_costs_last_year_dynamic()
         basic_input.save()
-        savings, positive_savings = basic_input.calculate_potential_savings()
+        calculator = Calculator(basic_input=basic_input)
+        result = calculator.calculate_costs()
+        savings, positive_savings = result.potential_savings()
         return {
             "basic_input": basic_input,
             "savings": savings,
             "positive_savings": positive_savings,
         }
-
-
-
-
-

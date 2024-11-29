@@ -1,12 +1,20 @@
 from dataclasses import dataclass
-from typing import Type, Union, Optional, Callable
+from typing import Callable, Optional, Type, Union
 
+from core.forms import (
+    CustomChoiceField,
+    CustomSelectWidget,
+    JsonSerializableForm,
+    JsonSerializableModelForm,
+    PreviousResponsesMixin,
+    StyledCharField,
+    StyledIntegerField,
+)
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-
-from core.forms import JsonSerializableForm, JsonSerializableModelForm, StyledCharField, StyledIntegerField, \
-    CustomSelectWidget, CustomChoiceField
-from electricity_rates.models import ZipCode, NetworkOperator
+from django.db.models import QuerySet
+from electric_cars.models import Car
+from electricity_rates.models import NetworkOperator, ZipCode
 
 
 @dataclass
@@ -16,8 +24,14 @@ class FlowStep:
     next: Optional[Callable[[dict], str]] = None
 
 
-class ZipCodeForm(JsonSerializableForm):
-    zip_code = StyledCharField(label="Wie lautet deine PLZ?", min_length=5, max_length=5, required=True)
+class JsonSerializablePreviousResponsesForm(PreviousResponsesMixin, JsonSerializableForm):
+    pass
+
+
+class ZipCodeForm(JsonSerializablePreviousResponsesForm):
+    zip_code = StyledCharField(
+        label="Wie lautet deine PLZ?", min_length=5, max_length=5, required=True
+    )
 
     def clean_zip_code(self):
         zip_code = self.cleaned_data.get("zip_code")
@@ -28,9 +42,20 @@ class ZipCodeForm(JsonSerializableForm):
         return zip_code
 
 
-class NetworkOperatorForm(JsonSerializableForm):
+class NetworkOperatorForm(JsonSerializablePreviousResponsesForm):
+    class Meta:
+        model = NetworkOperator
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.previous_responses:
+            zip_code = self.previous_responses.get("zip_code", {}).get("zip_code")
+            self.fields["network_operator"].queryset = NetworkOperator.objects.filter(
+                zip_code__zip_code=zip_code
+            )
+
     network_operator = forms.ModelChoiceField(
-        queryset=NetworkOperator.objects.all(),
+        queryset=NetworkOperator.objects.none(),
         label="Netzbetreiber",
         required=True,
         widget=CustomSelectWidget,
@@ -42,22 +67,39 @@ class NetworkOperatorForm(JsonSerializableForm):
     )
 
 
-class BasicFeeMonthlyStaticForm(JsonSerializableForm):
-    basic_fee_monthly_static = StyledIntegerField(label="Aktuelle monatliche Grundgebühr in Euro", required=True)
+class BasicFeeMonthlyStaticForm(JsonSerializablePreviousResponsesForm):
+    basic_fee_monthly_static = StyledIntegerField(
+        label="Aktuelle monatliche Grundgebühr in Euro", required=True
+    )
 
 
-class KilowattHourRateStaticForm(JsonSerializableForm):
-    kilowatt_hour_rate_static = StyledIntegerField(label="Aktueller Preis pro kWh in Cent", required=True)
+class KilowattHourRateStaticForm(JsonSerializablePreviousResponsesForm):
+    kilowatt_hour_rate_static = StyledIntegerField(
+        label="Aktueller Preis pro kWh in Cent", required=True
+    )
 
 
-class KilowattHoursLastYearStaticForm(JsonSerializableForm):
-    kilowatt_hours_last_year_static = StyledIntegerField(label="Verbrauch in kWh der letzten 12 Monate", required=True)
+class KilowattHoursLastYearStaticForm(JsonSerializablePreviousResponsesForm):
+    kilowatt_hours_last_year_static = StyledIntegerField(
+        label="Verbrauch in kWh der letzten 12 Monate", required=True
+    )
 
 
-class ElectricCarForm(JsonSerializableForm):
-    electric_car = CustomChoiceField(label="Elektroauto vorhanden?", required=True,
-                                     choices=((True, "Ja"), (False, "Nein")))
+class ElectricCarExistsForm(JsonSerializablePreviousResponsesForm):
+    electric_car_exists = CustomChoiceField(
+        label="Elektroauto vorhanden?", required=True, choices=((True, "Ja"), (False, "Nein"))
+    )
 
 
-class ElectricCarKilowattHoursForm(JsonSerializableForm):
-    electric_car_kilowatt_hours = StyledIntegerField(label="Kapazität der Autobatterie in kWh", required=True)
+class ElectricCarForm(JsonSerializablePreviousResponsesForm):
+    electric_car = forms.ModelChoiceField(
+        queryset=Car.objects.all(),
+        label="Elektroauto",
+        required=True,
+        widget=CustomSelectWidget,
+    )
+    electric_car.widget.attrs.update(
+        {
+            "placeholder": "Was für ein Elektroauto hast du?",
+        }
+    )
