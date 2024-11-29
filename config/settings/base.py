@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # custom
     "core",
     "electricity_rates",
+    "electric_cars",
     "external",
     # third-party
     "django_extensions",
