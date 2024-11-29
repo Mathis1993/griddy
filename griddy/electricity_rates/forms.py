@@ -50,8 +50,9 @@ class NetworkOperatorForm(JsonSerializablePreviousResponsesForm):
         super().__init__(*args, **kwargs)
         if self.previous_responses:
             zip_code = self.previous_responses.get("zip_code", {}).get("zip_code")
-            self.fields["network_operator"].queryset = NetworkOperator.objects.filter(
-                zip_code__zip_code=zip_code
+            network_operators = NetworkOperator.objects.filter(zip_code__zip_code=zip_code)
+            self.fields["network_operator"].queryset = (
+                network_operators if network_operators.exists() else NetworkOperator.objects.all()
             )
 
     network_operator = forms.ModelChoiceField(
