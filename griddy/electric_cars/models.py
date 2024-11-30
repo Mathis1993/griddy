@@ -1,6 +1,5 @@
-from django.db import models
-
 from core.models import TrackCreationAndUpdates
+from django.db import models
 
 
 class Car(TrackCreationAndUpdates):
@@ -12,3 +11,8 @@ class Car(TrackCreationAndUpdates):
 
     def __str__(self):
         return f"{self.name}"
+
+
+def calculate_charging_costs():
+    # ToDo(ME-29.11.24):
+    pass
