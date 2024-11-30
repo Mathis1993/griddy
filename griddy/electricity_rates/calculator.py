@@ -55,15 +55,16 @@ class Calculator:
             SpotPriceAverageLastYear.compute_and_store_average_last_year_from_today()
             average_spot_price_last_year = SpotPriceAverageLastYear.objects.filter(at=date.today())
 
+        average_spot_price_last_year = float(average_spot_price_last_year.first().price)
         # €/Mwh -> ct/kwH
         average_spot_price_last_year /= 10
 
         kilowatt_hours = self.basic_input.kilowatt_hours_last_year_static
         tax = self.tax_per_kilowatt_hour_cents
         grid_fee = (
-            fee_obj := self.basic_input.network_operator.grid_fees()
-            .filter(year=datetime.now().year)
-            .first()
+            fee_obj := self.basic_input.network_operator.grid_fees.filter(
+                year=datetime.now().year
+            ).first()
         )
 
         consumption_costs = (kilowatt_hours * (average_spot_price_last_year + tax + grid_fee)) / 100

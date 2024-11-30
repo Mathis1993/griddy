@@ -5,11 +5,11 @@
 <div class="p-4 bg-white rounded shadow-md">
     <p class="text-lg font-semibold">
         Kosten aktueller Tarif für die letzten 365 Tage: 
-        <span class="text-blue-600">{{ basic_input.electricity_costs_last_year_static }} €</span>
+        <span class="text-blue-600">{{ result.electricity_costs_last_year_static }} €</span>
     </p>
     <p class="text-lg font-semibold">
         Kosten dynamischer Tarif für die letzten 365 Tage:
-        <span class="text-blue-600">{{ basic_input.electricity_costs_last_year_dynamic }} €</span>
+        <span class="text-blue-600">{{ result.electricity_costs_last_year_dynamic }} €</span>
     </p>
 
     {% if positive_savings %}

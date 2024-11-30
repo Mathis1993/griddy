@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.utils.datastructures import MultiValueDict
 from django.views.generic import FormView
 from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
@@ -96,7 +97,7 @@ class ZipCodeView(FormView):
             result_data = self.handle_completion()
             self.template_name = "result.html"
             context = self.get_context_data()
-            context["basic_input"] = result_data.get("basic_input")
+            context["result"] = result_data.get("result")
             context["savings"] = result_data.get("savings")
             context["positive_savings"] = result_data.get("positive_savings")
             messages.add_message(
@@ -109,10 +110,16 @@ class ZipCodeView(FormView):
                 "Dein Ergebnis wurde berechnet!",
             )
             return self.render_to_response(context)
-        else:
-            self.template_name = next_step.template_name
-            self.form_class = next_step.form_class
-        return self.render_to_response(self.get_context_data(form=self.form_class()))
+
+        self.template_name = next_step.template_name
+        self.form_class = next_step.form_class
+        # get_form calls get_form_kwargs which for request.method == POST
+        # sets the data attribute on the form leading it to be "bound",
+        # triggering validation resulting in an error message because of course
+        # the field the form consists of is empty (but probably required)
+        form = self.get_form()
+        form.is_bound = False
+        return self.render_to_response(self.get_context_data(form=form))
 
     def get_current_step(self):
         return self.flow.get(self.get_current_step_key())
@@ -179,7 +186,7 @@ class ZipCodeView(FormView):
         result = calculator.calculate_costs()
         savings, positive_savings = result.potential_savings()
         return {
-            "basic_input": basic_input,
+            "result": result,
             "savings": savings,
             "positive_savings": positive_savings,
         }
