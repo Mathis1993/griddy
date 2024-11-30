@@ -79,3 +79,15 @@ class NetworkOperator(TrackCreationAndUpdates):
 
     def __str__(self):
         return self.name
+
+
+class GridFee(TrackCreationAndUpdates):
+    class Meta:
+        db_table = "electricity_rates_grid_fees"
+
+    network_operator = models.ForeignKey(
+        NetworkOperator, on_delete=models.CASCADE, related_name="grid_fees"
+    )
+    grid_fee_per_kilowatt_hour_cents = models.DecimalField(max_digits=10, decimal_places=2)
+    basic_grid_fee_yearly_euro = models.DecimalField(max_digits=10, decimal_places=2)
+    year = models.IntegerField()
