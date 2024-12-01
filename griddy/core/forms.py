@@ -72,6 +72,11 @@ class CustomSelectWidget(forms.Select):
     option_template_name = "widgets/select_option.html"
 
 
+class CustomMultipleSelectWidget(forms.SelectMultiple):
+    template_name = "widgets/select_multiple.html"
+    option_template_name = "widgets/select_option.html"
+
+
 class CustomCheckBoxWidget(forms.CheckboxInput):
     template_name = "widgets/checkbox.html"
 

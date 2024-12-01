@@ -32,6 +32,10 @@ class BasicInput(TrackCreationAndUpdates):
         blank=True,
         default=None,
     )
+    electric_car_charging_frequency = models.IntegerField(null=True, blank=True, default=None)
+    electric_car_charging_weekdays = models.CharField(
+        max_length=255, null=True, blank=True, default=None
+    )
 
 
 class Result(TrackCreationAndUpdates):

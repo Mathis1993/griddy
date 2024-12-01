@@ -5,6 +5,9 @@ from django.views.generic import FormView
 from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
     BasicFeeMonthlyStaticForm,
+    ChargingFrequencyForm,
+    ChargingSpecificWeekdaysForm,
+    ChargingWeekdaysForm,
     ElectricCarExistsForm,
     ElectricCarForm,
     FlowStep,
@@ -64,6 +67,25 @@ class ZipCodeView(FormView):
         "electric_car": FlowStep(
             form_class=ElectricCarForm,
             template_name="electric_car.html",
+            next=lambda _: "charging_frequency",
+        ),
+        "charging_frequency": FlowStep(
+            form_class=ChargingFrequencyForm,
+            template_name="charging_frequency.html",
+            next=lambda _: "charging_specific_weekdays",
+        ),
+        "charging_specific_weekdays": FlowStep(
+            form_class=ChargingSpecificWeekdaysForm,
+            template_name="charging_specific_weekdays.html",
+            next=lambda responses: (
+                "charging_weekdays"
+                if responses["charging_specific_weekdays"]["charging_specific_weekdays"] == "True"
+                else None
+            ),
+        ),
+        "charging_weekdays": FlowStep(
+            form_class=ChargingWeekdaysForm,
+            template_name="charging_weekdays.html",
         ),
     }
 
@@ -182,6 +204,12 @@ class ZipCodeView(FormView):
                 "kilowatt_hours_last_year_static"
             ],
             "electric_car_id": electric_car_id,
+            "electric_car_charging_frequency": form_responses.get("charging_frequency", {}).get(
+                "charging_frequency"
+            ),
+            "electric_car_charging_weekdays": form_responses.get("charging_weekdays", {}).get(
+                "charging_weekdays"
+            ),
         }
         basic_input = BasicInput(**form_data)
         basic_input.save()

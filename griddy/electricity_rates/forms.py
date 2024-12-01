@@ -3,6 +3,7 @@ from typing import Callable, Optional, Type, Union
 
 from core.forms import (
     CustomChoiceField,
+    CustomMultipleSelectWidget,
     CustomSelectWidget,
     JsonSerializableForm,
     JsonSerializableModelForm,
@@ -87,7 +88,7 @@ class KilowattHoursLastYearStaticForm(JsonSerializablePreviousResponsesForm):
 
 class ElectricCarExistsForm(JsonSerializablePreviousResponsesForm):
     electric_car_exists = CustomChoiceField(
-        label="Elektroauto vorhanden?", required=True, choices=((True, "Ja"), (False, "Nein"))
+        label="Hast du ein Elektroauto?", required=True, choices=((True, "Ja"), (False, "Nein"))
     )
 
 
@@ -103,3 +104,43 @@ class ElectricCarForm(JsonSerializablePreviousResponsesForm):
             "placeholder": "Was für ein Elektroauto hast du?",
         }
     )
+
+
+class ChargingFrequencyForm(JsonSerializablePreviousResponsesForm):
+    charging_frequency = StyledIntegerField(
+        label="Wie häufig lädst du dein Auto im Schnitt pro Monat?", required=True
+    )
+
+
+class ChargingSpecificWeekdaysForm(JsonSerializablePreviousResponsesForm):
+    charging_specific_weekdays = CustomChoiceField(
+        label="Lädst du dein Auto in der Regel an bestimmten Wochentagen?",
+        required=True,
+        choices=((True, "Ja"), (False, "Nein")),
+    )
+
+
+class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
+    charging_weekdays = forms.MultipleChoiceField(
+        label="Ladetage",
+        required=True,
+        choices=(
+            ("monday", "Montag"),
+            ("tuesday", "Dienstag"),
+            ("wednesday", "Mittwoch"),
+            ("thursday", "Donnerstag"),
+            ("friday", "Freitag"),
+            ("saturday", "Samstag"),
+            ("sunday", "Sonntag"),
+        ),
+        widget=CustomMultipleSelectWidget,
+    )
+    charging_weekdays.widget.attrs.update(
+        {
+            "placeholder": "Welche Wochentage sind das?",
+        }
+    )
+
+    def clean_charging_weekdays(self):
+        weekdays = self.cleaned_data["charging_weekdays"]
+        return ",".join(weekdays) if weekdays else None
