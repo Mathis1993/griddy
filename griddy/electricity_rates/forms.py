@@ -49,7 +49,7 @@ class NetworkOperatorForm(JsonSerializablePreviousResponsesForm):
         super().__init__(*args, **kwargs)
         if self.previous_responses:
             zip_code = self.previous_responses.get("zip_code", {}).get("zip_code")
-            network_operators = ZipCode.objects.get(zip_code=zip_code).network_operators()
+            network_operators = ZipCode.objects.get(zip_code=zip_code).network_operators.all()
             self.fields["network_operator"].queryset = (
                 network_operators if network_operators.exists() else NetworkOperator.objects.all()
             )

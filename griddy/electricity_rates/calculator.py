@@ -61,14 +61,21 @@ class Calculator:
 
         kilowatt_hours = self.basic_input.kilowatt_hours_last_year_static
         tax = self.tax_per_kilowatt_hour_cents
-        grid_fee = (
-            fee_obj := self.basic_input.network_operator.grid_fees.filter(
-                year=datetime.now().year
-            ).first()
-        )
+        grid_fee = self.basic_input.network_operator.grid_fees.filter(
+            year=datetime.now().year
+        ).first()
 
-        consumption_costs = (kilowatt_hours * (average_spot_price_last_year + tax + grid_fee)) / 100
-        basic_fees = fee_obj.basic_grid_fee_yearly_euro + 12 * self.basic_fee_monthly_dynamic
+        consumption_costs = (
+            kilowatt_hours
+            * (
+                average_spot_price_last_year
+                + tax
+                + float(grid_fee.grid_fee_per_kilowatt_hour_cents)
+            )
+        ) / 100
+        basic_fees = float(
+            grid_fee.basic_grid_fee_yearly_euro + 12 * self.basic_fee_monthly_dynamic
+        )
 
         costs_net = consumption_costs + basic_fees
         self.result.electricity_costs_last_year_dynamic = round(1.19 * costs_net, 2)

@@ -147,7 +147,6 @@ class ZipCodeView(FormView):
 
     def handle_completion(self):
         form_responses = self.request.session["form_progress"]["responses"]
-        print(form_responses)
         result_data = self.process_form_responses(form_responses)
         del self.request.session["form_progress"]
         return result_data
