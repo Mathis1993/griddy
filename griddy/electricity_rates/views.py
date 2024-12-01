@@ -161,7 +161,11 @@ class ZipCodeView(FormView):
             "network_operator",
             (
                 network_operator.id
-                if (network_operator := NetworkOperator.objects.filter(zip_code=zip_code).first())
+                if (
+                    network_operator := ZipCode.objects.get(
+                        zip_code=zip_code
+                    ).network_operators.first()
+                )
                 else None
             ),
         )

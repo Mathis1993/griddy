@@ -73,12 +73,27 @@ class NetworkOperator(TrackCreationAndUpdates):
         db_table = "electricity_rates_network_operators"
 
     name = models.CharField(max_length=255, unique=True)
-    zip_code = models.ForeignKey(
-        ZipCode, on_delete=models.RESTRICT, related_name="network_operators"
+    zip_codes = models.ManyToManyField(
+        ZipCode, through="NetworkOperatorZipCode", related_name="network_operators"
     )
 
     def __str__(self):
         return self.name
+
+
+class NetworkOperatorZipCode(TrackCreationAndUpdates):
+    class Meta:
+        db_table = "electricity_rates_network_operators_zip_codes"
+        unique_together = ("network_operator", "zip_code")
+
+    network_operator = models.ForeignKey(
+        NetworkOperator,
+        on_delete=models.CASCADE,
+        related_name="network_operators_zip_codes_operators",
+    )
+    zip_code = models.ForeignKey(
+        ZipCode, on_delete=models.RESTRICT, related_name="network_operators_zip_codes_codes"
+    )
 
 
 class GridFee(TrackCreationAndUpdates):
