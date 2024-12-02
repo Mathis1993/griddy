@@ -10,7 +10,7 @@ class Importer:
     """
 
     column_network_operators = "Netzbetreiber"
-    column_zip_codes = "PLZ"
+    column_zip_codes = "postalCode"
     column_grid_fee_per_kilowatt_hour_cents = "Netzentgelt 2025 in ct/kWh"
     column_basic_grid_fee_yearly_euro = "Netzgrundpreis 2025 in €"
     network_operators_name_to_id = {}
