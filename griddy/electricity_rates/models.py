@@ -1,4 +1,5 @@
 import logging
+from typing import List, Optional
 
 from core.models import TrackCreationAndUpdates
 from django.db import models
@@ -36,6 +37,13 @@ class BasicInput(TrackCreationAndUpdates):
     electric_car_charging_weekdays = models.CharField(
         max_length=255, null=True, blank=True, default=None
     )
+
+    def get_electric_car_charging_weekdays(self) -> Optional[List[str]]:
+        return (
+            self.electric_car_charging_weekdays.split(",")
+            if self.electric_car_charging_weekdays
+            else None
+        )
 
 
 class Result(TrackCreationAndUpdates):
