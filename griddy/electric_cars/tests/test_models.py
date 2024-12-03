@@ -74,4 +74,4 @@ def test_car_calculate_charging_costs():
     charging_frequency_per_month = 4
     preferred_weekdays = ["monday", "tuesday"]
 
-    charging_dates = car.calculate_charging_costs(charging_frequency_per_month, preferred_weekdays)
+    charging_costs = car.calculate_charging_costs(charging_frequency_per_month, preferred_weekdays)

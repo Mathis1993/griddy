@@ -107,6 +107,7 @@ class ElectricCarForm(JsonSerializablePreviousResponsesForm):
 
 
 class ChargingFrequencyForm(JsonSerializablePreviousResponsesForm):
+    # ToDo(ME-04.12.24): Check if electric_car_kilowatt_hours is an abnormally big amount of or even more than the total kilowatt_hours_last_year_static
     charging_frequency = StyledIntegerField(
         label="Wie häufig lädst du dein Auto im Schnitt pro Monat?", required=True
     )

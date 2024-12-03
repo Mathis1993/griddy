@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from core.models import TrackCreationAndUpdates
 from django.db import models
+from external.models import SpotPriceHourly
 
 CHARGING_SPEED_KWH_PER_HOUR = 11
 
@@ -21,8 +22,15 @@ class Car(TrackCreationAndUpdates):
     def calculate_charging_time_hours(self) -> int:
         return int(self.battery_capacity_kwh / CHARGING_SPEED_KWH_PER_HOUR)
 
+    def calculate_charging_kilowatt_hours(self, charging_frequency_per_month) -> int:
+        """
+        Calculates the total kilowatt-hours charged into the car over the last 12 months based
+        on a charging frequency per month.
+        """
+        return self.battery_capacity_kwh * charging_frequency_per_month * 12
+
     def calculate_charging_costs(
-        self, charging_frequency_per_month: int, preferred_weekdays: List[str]
+        self, charging_frequency_per_month: int, preferred_weekdays: Optional[List[str]] = None
     ) -> float:
         """
         Calculates the charging costs for the last 12 months based on the charging frequency per month and historical data.
@@ -40,11 +48,17 @@ class Car(TrackCreationAndUpdates):
                 for charging_date in charging_dates_per_month
             ]
         )
-        charging_hours = self.calculate_charging_time_hours()
-        # Get the spot prices for each charging date
-        # For a charging date, get the charging_hours cheapest hours and sum the costs (costs per hour * CHARGING_SPEED_KWH_PER_HOUR for each hour)
 
-        return 0.0
+        charging_costs = float(
+            sum(
+                [
+                    self.calculate_charging_costs_for_date(charging_date)
+                    for charging_date in charging_dates
+                ]
+            )
+        )
+
+        return charging_costs
 
     @staticmethod
     def pick_charging_dates(
@@ -74,6 +88,17 @@ class Car(TrackCreationAndUpdates):
         return _pick_charging_dates(
             days_by_week_and_month, charging_days_per_week, remaining_days_per_month
         )
+
+    def calculate_charging_costs_for_date(self, charging_date: date) -> float:
+        charging_hours = self.calculate_charging_time_hours()
+        sport_prices = SpotPriceHourly.get_prices_for_date(charging_date)
+        cheapest_hours = sorted(sport_prices, key=lambda x: x.price)[:charging_hours]
+        # ToDo(ME-04.12.24): More exact calculation -> take into account the exact charging time (not only full hours)
+        # €/MWh -> ct/kWh
+        charging_costs_date = sum(
+            [(hour.price / 10) * CHARGING_SPEED_KWH_PER_HOUR for hour in cheapest_hours]
+        )
+        return charging_costs_date
 
 
 def _pick_charging_dates(
