@@ -17,7 +17,7 @@ class Importer:
     zip_codes_code_to_id = {}
 
     def __init__(self, path: str):
-        self.df = pd.read_excel(path)
+        self.df = pd.read_excel(path, converters={self.column_zip_codes: str})
 
     def import_network_operator_data(self):
         self.create_zip_codes()
@@ -29,8 +29,8 @@ class Importer:
         zip_codes = self.df.loc[:, self.column_zip_codes]
         zip_codes.dropna(inplace=True)
         zip_codes = list(set(zip_codes))
-        zip_code_objs = [ZipCode(zip_code=str(int(code))) for code in zip_codes]
-        zip_codes = ZipCode.objects.bulk_create(zip_code_objs, ignore_conflicts=True)
+        zip_code_objs = [ZipCode(zip_code=code) for code in zip_codes]
+        ZipCode.objects.bulk_create(zip_code_objs, ignore_conflicts=True)
         self.zip_codes_code_to_id = {
             zip_code.zip_code: zip_code.id for zip_code in ZipCode.objects.all()
         }
@@ -64,11 +64,7 @@ class Importer:
                     row.get(self.column_network_operators)
                 )
             )
-            and (
-                zip_code_id := self.zip_codes_code_to_id.get(
-                    str(int(row.get(self.column_zip_codes)))
-                )
-            )
+            and (zip_code_id := self.zip_codes_code_to_id.get(str(row.get(self.column_zip_codes))))
         ]
         NetworkOperatorZipCode.objects.bulk_create(
             network_operators_zip_codes, ignore_conflicts=True
