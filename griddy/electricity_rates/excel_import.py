@@ -4,7 +4,7 @@ import pandas as pd
 from electricity_rates.models import GridFee, NetworkOperator, NetworkOperatorZipCode, ZipCode
 
 
-class Importer:
+class NetworkOperatorImporter:
     """
     Used to import network operators per zip code and their grid fees.
     """

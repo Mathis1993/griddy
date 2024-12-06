@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from electric_cars.tests.factories import CarFactory
-from electricity_rates.excel_import import Importer
+from electricity_rates.excel_import import NetworkOperatorImporter
 
 NETWORK_OPERATOR_DATA_PATH = "data/network_operators_costs_2025.xlsx"
 
@@ -19,5 +19,5 @@ def _seed_database():
 
 
 def _import_network_operator_data():
-    importer = Importer(NETWORK_OPERATOR_DATA_PATH)
+    importer = NetworkOperatorImporter(NETWORK_OPERATOR_DATA_PATH)
     importer.import_network_operator_data()
