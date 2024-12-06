@@ -12,12 +12,22 @@ CHARGING_SPEED_KWH_PER_HOUR = 11
 class Car(TrackCreationAndUpdates):
     class Meta:
         db_table = "electric_cars"
+        ordering = ("make", "model", "model_version", "model_year", "battery_capacity_kwh")
 
-    name = models.CharField(max_length=255)
+    make = models.CharField(max_length=255)
+    model = models.CharField(max_length=255)
+    model_version = models.CharField(max_length=255, null=True, blank=True, default=None)
+    model_year = models.CharField(max_length=255, null=True, blank=True, default=None)
     battery_capacity_kwh = models.IntegerField()
 
     def __str__(self):
-        return f"{self.name}"
+        name = f"{self.make} {self.model}"
+        kwh_in_name = "kwh" in name.lower()
+        if self.model_year:
+            if not kwh_in_name:
+                return f"{name} ({self.model_year} - {self.battery_capacity_kwh} kWh)"
+            return f"{name} ({self.model_year})"
+        return f"{name} ({self.battery_capacity_kwh} kWh)" if not kwh_in_name else name
 
     def calculate_charging_time_hours(self) -> int:
         return int(self.battery_capacity_kwh / CHARGING_SPEED_KWH_PER_HOUR)
