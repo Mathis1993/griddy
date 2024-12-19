@@ -22,6 +22,8 @@ class Car(TrackCreationAndUpdates):
 
     def __str__(self):
         name = f"{self.make} {self.model}"
+        if self.model_version:
+            name += f" {self.model_version}"
         kwh_in_name = "kwh" in name.lower()
         if self.model_year:
             if not kwh_in_name:
