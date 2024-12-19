@@ -25,7 +25,15 @@ class FlowStep:
 
 
 class JsonSerializablePreviousResponsesForm(PreviousResponsesMixin, JsonSerializableForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.set_initial_value(field_name)
+
+    def set_initial_value(self, field_name: str):
+        if self.previous_responses:
+            initial_value = self.previous_responses.get(field_name, {}).get(field_name)
+            self.fields[field_name].initial = initial_value
 
 
 class ZipCodeForm(JsonSerializablePreviousResponsesForm):
