@@ -1,22 +1,24 @@
 from django.conf import settings
 from django.contrib import messages
-from django.utils.datastructures import MultiValueDict
 from django.views.generic import FormView
 from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
     BasicFeeMonthlyStaticForm,
+    BatteryExistsForm,
     ChargingFrequencyForm,
     ChargingSpecificWeekdaysForm,
     ChargingWeekdaysForm,
+    ChargingWithSolarPowerForm,
     ElectricCarExistsForm,
     ElectricCarForm,
     FlowStep,
     KilowattHourRateStaticForm,
     KilowattHoursLastYearStaticForm,
     NetworkOperatorForm,
+    SolarSystemExistsForm,
     ZipCodeForm,
 )
-from electricity_rates.models import BasicInput, NetworkOperator, ZipCode
+from electricity_rates.models import BasicInput, ZipCode
 
 
 class ZipCodeView(FormView):
@@ -60,7 +62,7 @@ class ZipCodeView(FormView):
             next=lambda responses: (
                 "electric_car"
                 if responses["electric_car_exists"]["electric_car_exists"] == "True"
-                else None
+                else "solar_system_exists"
             ),
         ),
         # ToDo(ME-29.11.24): Option to add multiple electric cars
@@ -80,12 +82,39 @@ class ZipCodeView(FormView):
             next=lambda responses: (
                 "charging_weekdays"
                 if responses["charging_specific_weekdays"]["charging_specific_weekdays"] == "True"
-                else None
+                else "solar_system_exists"
             ),
         ),
         "charging_weekdays": FlowStep(
             form_class=ChargingWeekdaysForm,
             template_name="charging_weekdays.html",
+            next=lambda _: "solar_system_exists",
+        ),
+        "solar_system_exists": FlowStep(
+            form_class=SolarSystemExistsForm,
+            template_name="solar_system_exists.html",
+            next=lambda responses: (
+                "charging_with_solar_power"
+                if (
+                    (
+                        solar_system_exists := responses["solar_system_exists"][
+                            "solar_system_exists"
+                        ]
+                        == "True"
+                    )
+                    and responses["electric_car_exists"]["electric_car_exists"] == "True"
+                )
+                else "battery_exists" if solar_system_exists else None
+            ),
+        ),
+        "charging_with_solar_power": FlowStep(
+            form_class=ChargingWithSolarPowerForm,
+            template_name="charging_with_solar_power.html",
+            next=lambda _: "battery_exists",
+        ),
+        "battery_exists": FlowStep(
+            form_class=BatteryExistsForm,
+            template_name="battery_exists.html",
         ),
     }
 
@@ -210,6 +239,13 @@ class ZipCodeView(FormView):
             "electric_car_charging_weekdays": form_responses.get("charging_weekdays", {}).get(
                 "charging_weekdays"
             ),
+            "solar_system_exists": form_responses.get("solar_system_exists", {}).get(
+                "solar_system_exists", False
+            ),
+            "electric_car_charging_with_solar_power": form_responses.get(
+                "charging_with_solar_power", {}
+            ).get("charging_with_solar_power", False),
+            "battery_exists": form_responses.get("battery_exists", {}).get("battery_exists", False),
         }
         basic_input = BasicInput(**form_data)
         basic_input.save()

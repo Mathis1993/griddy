@@ -37,6 +37,9 @@ class BasicInput(TrackCreationAndUpdates):
     electric_car_charging_weekdays = models.CharField(
         max_length=255, null=True, blank=True, default=None
     )
+    solar_system_exists = models.BooleanField(default=False)
+    electric_car_charging_with_solar_power = models.BooleanField(default=False)
+    battery_exists = models.BooleanField(default=False)
 
     def get_electric_car_charging_weekdays(self) -> Optional[List[str]]:
         return (

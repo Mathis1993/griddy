@@ -145,3 +145,23 @@ class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
     def clean_charging_weekdays(self):
         weekdays = self.cleaned_data["charging_weekdays"]
         return ",".join(weekdays) if weekdays else None
+
+
+class SolarSystemExistsForm(JsonSerializablePreviousResponsesForm):
+    solar_system_exists = CustomChoiceField(
+        label="Hast du eine Solaranlage?", required=True, choices=((True, "Ja"), (False, "Nein"))
+    )
+
+
+class ChargingWithSolarPowerForm(JsonSerializablePreviousResponsesForm):
+    charging_with_solar_power = CustomChoiceField(
+        label="Lädst du dein Auto im Sommer hauptsächlich mit Solarstrom?",
+        required=True,
+        choices=((True, "Ja"), (False, "Nein")),
+    )
+
+
+class BatteryExistsForm(JsonSerializablePreviousResponsesForm):
+    battery_exists = CustomChoiceField(
+        label="Hast du einen Stromspeicher?", required=True, choices=((True, "Ja"), (False, "Nein"))
+    )
