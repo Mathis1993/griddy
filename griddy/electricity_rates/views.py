@@ -24,6 +24,7 @@ from electricity_rates.models import BasicInput, ZipCode
 class ZipCodeView(FormView):
     template_name = "calculator.html"
     form_class = ZipCodeForm
+    form_template = "zip_code.html"
     flow = {
         "zip_code": FlowStep(
             form_class=ZipCodeForm,
@@ -119,8 +120,18 @@ class ZipCodeView(FormView):
     }
 
     def get(self, request, *args, **kwargs):
-        # ToDo(ME-22.11.24): Handle full page reload somewhere during the form process
+        # On a full page reload, stay on the current step
+        # (render the initial template while including the current form)
+        if "form_progress" in self.request.session:
+            current_step = self.get_current_step()
+            self.form_class = current_step.form_class
+            self.form_template = current_step.template_name
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form_template"] = self.form_template
+        return context
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
