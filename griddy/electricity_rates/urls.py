@@ -1,9 +1,8 @@
 from django.urls import path
-
-from electricity_rates.views import ZipCodeView
+from electricity_rates.views import CalculatorView
 
 app_name = "electricity_rates"
 
 urlpatterns = [
-    path("", ZipCodeView.as_view(), name="calculator"),
+    path("", CalculatorView.as_view(), name="calculator"),
 ]
