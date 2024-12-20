@@ -72,6 +72,18 @@ class SpotPriceHourly(SpotPrice):
     def get_prices_for_date(cls, date_to_get: date):
         return cls.objects.filter(at__date=date_to_get).order_by("at")
 
+    def calculate_average_price_for_time_period(self, start: date, end: date) -> float:
+        if (
+            not SpotPriceHourly.objects.filter(at=start).exists()
+            or not SpotPriceHourly.objects.filter(at=end).exists()
+        ):
+            logger.info("Spot price data is missing, attempting to import")
+            SpotPriceHourly.import_prices(start, end)
+
+        logger.info(f"Computing average spot price from {start} to {end}.")
+        prices = self.objects.filter(at__range=[start, end])
+        return prices.aggregate(models.Avg("price"))["price__avg"]
+
 
 class SpotPriceAverageLastYear(SpotPrice):
     class Meta:
