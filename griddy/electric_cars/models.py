@@ -42,11 +42,14 @@ class Car(TrackCreationAndUpdates):
         return self.battery_capacity_kwh * charging_frequency_per_month * 12
 
     def calculate_charging_costs(
-        self, charging_frequency_per_month: int, preferred_weekdays: Optional[List[str]] = None
+        self,
+        charging_frequency_per_month: int,
+        preferred_weekdays: Optional[List[str]] = None,
+        winter_half_only: bool = False,
     ) -> float:
         """
-        Calculates the charging costs for the last 12 months based on the charging frequency per month and historical data.
-        The charging events per month are distributed over the last 12 months.
+        Calculates the charging costs for the last [charging_months] months based on the charging frequency per month and historical data.
+        The charging events per month are distributed over the last [charging_months] months.
         For the selected dates, it is assumed that charging happened during the cheapest hours of the day.
         If preferred_weekdays are given, dates corresponding to these weekdays will be used for the calculation.
         Otherwise, dates with no restriction to weekdays will be used.
@@ -55,7 +58,7 @@ class Car(TrackCreationAndUpdates):
             [
                 charging_date
                 for charging_dates_per_month in self.pick_charging_dates(
-                    charging_frequency_per_month, preferred_weekdays
+                    charging_frequency_per_month, preferred_weekdays, winter_half_only
                 )
                 for charging_date in charging_dates_per_month
             ]
@@ -74,10 +77,20 @@ class Car(TrackCreationAndUpdates):
 
     @staticmethod
     def pick_charging_dates(
-        charging_frequency_per_month: int, preferred_weekdays: Optional[List[str]] = None
+        charging_frequency_per_month: int,
+        preferred_weekdays: Optional[List[str]] = None,
+        winter_half_only: bool = False,
     ) -> List[List[date]]:
         one_year_ago = datetime.now() - timedelta(days=365)
         months = [one_year_ago + timedelta(weeks=4 * i) for i in range(12)]
+        if winter_half_only:
+            # pick six months that represent the winter half of the year
+            winter_months = [month for month in months if month.month in [1, 2, 3, 10, 11, 12]]
+            if len(winter_months) < 6:
+                winter_months += [month for month in months if month.month in [9]]
+            if len(winter_months) < 6:
+                winter_months += [month for month in months if month.month in [4]]
+            months = winter_months
         weeks_by_month = [[month + timedelta(weeks=i) for i in range(4)] for month in months]
         days_by_week_and_month = [
             [[(week + timedelta(days=i)).date() for i in range(7)] for week in weeks]

@@ -66,6 +66,15 @@ def test_car_pick_charging_dates():
         assert count_of_tuesdays == 4
         assert count_of_thursdays == 4
 
+    # winter half only
+    charging_frequency_per_month = 4
+    charging_dates = car.pick_charging_dates(charging_frequency_per_month, winter_half_only=True)
+    assert len(charging_dates) == 6
+    for days_by_month in charging_dates:
+        assert len(days_by_month) == charging_frequency_per_month
+        assert sorted(list(set(days_by_month))) == sorted(days_by_month)
+        assert days_by_month[0].month in [1, 2, 3, 4, 9, 10, 11, 12]
+
 
 @pytest.mark.django_db
 def test_car_calculate_charging_costs():
