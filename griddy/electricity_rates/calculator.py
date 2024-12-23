@@ -106,6 +106,9 @@ class Calculator:
         # If charging with solar power, consider only the year's winter half for charging events
         if winter_half_only := self.basic_input.electric_car_charging_with_solar_power:
             electric_car_kilowatt_hours /= 2
+        # ToDo(ME-23.12.24): electric_car_kilowatt_hours calculation inside calculate_charging_costs
+        # ToDo(ME-23.12.24): Return result object also containing mean ct/kWh
+        #  for charging electric car and potential warnings
         electric_car_charging_costs = self.basic_input.electric_car.calculate_charging_costs(
             self.basic_input.electric_car_charging_frequency,
             self.basic_input.get_electric_car_charging_weekdays(),
@@ -113,6 +116,7 @@ class Calculator:
         )
         return electric_car_kilowatt_hours, electric_car_charging_costs
 
+    # ToDo(ME-23.12.24): Return result object also containing mean ct/kWh for household consumption
     def calculate_costs_household(self, kilowatt_hours_household: float) -> float:
         # solar system + battery -> 75% of kilowatt_hours_household in winter half
         # solar system -> 65% of kilowatt_hours_household in winter half
