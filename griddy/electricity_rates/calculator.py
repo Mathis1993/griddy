@@ -133,7 +133,7 @@ class Calculator:
         summer_days = sum([winter_range.days for winter_range in winter_ranges])
         average_prices_winter = [
             SpotPriceHourly.calculate_average_price_for_time_period(
-                start=winter_range.start, end=winter_range.end
+                start=winter_range.start.date(), end=winter_range.end.date()
             )
             * winter_range.days
             / winter_days
@@ -141,7 +141,7 @@ class Calculator:
         ]
         average_prices_summer = [
             SpotPriceHourly.calculate_average_price_for_time_period(
-                start=summer_range.start, end=summer_range.end
+                start=summer_range.start.date(), end=summer_range.end.date()
             )
             * summer_range.days
             / summer_days
