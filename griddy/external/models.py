@@ -1,5 +1,6 @@
 import logging
 from datetime import date, datetime, timedelta
+from typing import Literal
 
 from core.models import TrackCreation
 from django.db import models
@@ -73,7 +74,9 @@ class SpotPriceHourly(SpotPrice):
         return cls.objects.filter(at__date=date_to_get).order_by("at")
 
     @classmethod
-    def calculate_average_price_for_time_period(cls, start: date, end: date) -> float:
+    def calculate_price_for_time_period(
+        cls, start: date, end: date, aggregation_type: Literal["average", "min", "max"] = "average"
+    ) -> float:
         if (
             not SpotPriceHourly.objects.filter(at=start).exists()
             or not SpotPriceHourly.objects.filter(at=end).exists()
@@ -83,7 +86,11 @@ class SpotPriceHourly(SpotPrice):
 
         logger.info(f"Computing average spot price from {start} to {end}.")
         prices = cls.objects.filter(at__range=[start, end])
-        return prices.aggregate(models.Avg("price"))["price__avg"]
+        if aggregation_type == "min":
+            return float(prices.order_by("price").first().price)
+        if aggregation_type == "max":
+            return float(prices.order_by("-price").first().price)
+        return float(prices.aggregate(models.Avg("price"))["price__avg"])
 
 
 class SpotPriceAverageLastYear(SpotPrice):
