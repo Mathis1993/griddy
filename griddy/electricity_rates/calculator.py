@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from functools import cached_property
 from typing import List, Tuple
 
+from dateutil.utils import today
 from electricity_rates.models import BasicInput, Result
-from external.models import SpotPriceHourly
+from external.models import SpotPriceAverageLastYear, SpotPriceHourly
 
 BASIC_FEE_MONTHLY_DYNAMIC_TIBBER_EURO = 6
 TAX_PER_KILOWATT_HOUR_CENTS = 6.4
@@ -43,6 +44,7 @@ class Calculator:
     def calculate_costs(self) -> Result:
         self.calculate_costs_static_rate()
         self.calculate_costs_dynamic_rate()
+        self.calculate_price_range()
         self.result.save()
         return self.result
 
@@ -94,6 +96,36 @@ class Calculator:
         total_costs = 1.19 * (consumption_costs + basic_fees)
         self.result.electricity_costs_last_year_dynamic = round(total_costs, 2)
 
+    # ToDo(ME-23.12.24): Validate this is correct
+    def calculate_price_range(self):
+        """
+        Calculates the min, max and mean (brutto) ct/kWh prices for the last year.
+        """
+        now = datetime.now()
+        one_year_ago = now - timedelta(days=365)
+        mean_last_year = SpotPriceHourly.calculate_price_for_time_period(
+            start=one_year_ago.date(), end=now.date()
+        )
+        min_last_year = SpotPriceHourly.calculate_price_for_time_period(
+            start=one_year_ago.date(), end=now.date(), aggregation_type="min"
+        )
+        max_last_year = SpotPriceHourly.calculate_price_for_time_period(
+            start=one_year_ago.date(), end=now.date(), aggregation_type="max"
+        )
+
+        prices = [mean_last_year, min_last_year, max_last_year]
+
+        # €/MWh -> ct/kWh
+        prices = [price / 10 for price in prices]
+
+        prices = [self.add_tax_and_grid_fee_to_costs(1, price) for price in prices]
+
+        (
+            self.result.mean_price_kilowatt_hours_last_year_dynamic,
+            self.result.min_price_kilowatt_hours_last_year_dynamic,
+            self.result.max_price_kilowatt_hours_last_year_dynamic,
+        ) = prices
+
     def calculate_kwh_and_charging_costs_electric_car(self) -> tuple[float, float]:
         if self.basic_input.electric_car is None:
             return 0.0, 0.0
@@ -136,7 +168,7 @@ class Calculator:
         winter_days = sum([winter_range.days for winter_range in winter_ranges])
         summer_days = sum([winter_range.days for winter_range in winter_ranges])
         average_prices_winter = [
-            SpotPriceHourly.calculate_average_price_for_time_period(
+            SpotPriceHourly.calculate_price_for_time_period(
                 start=winter_range.start.date(), end=winter_range.end.date()
             )
             * winter_range.days
@@ -144,7 +176,7 @@ class Calculator:
             for winter_range in winter_ranges
         ]
         average_prices_summer = [
-            SpotPriceHourly.calculate_average_price_for_time_period(
+            SpotPriceHourly.calculate_price_for_time_period(
                 start=summer_range.start.date(), end=summer_range.end.date()
             )
             * summer_range.days

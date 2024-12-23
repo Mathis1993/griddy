@@ -60,6 +60,15 @@ class Result(TrackCreationAndUpdates):
     electricity_costs_last_year_dynamic = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, blank=True, default=None
     )
+    mean_price_kilowatt_hours_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    min_price_kilowatt_hours_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    max_price_kilowatt_hours_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
 
     def potential_savings(self):
         savings = round(
