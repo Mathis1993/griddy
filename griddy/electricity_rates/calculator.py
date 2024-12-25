@@ -120,6 +120,8 @@ class Calculator:
 
         prices = [self.add_tax_and_grid_fee_to_costs(1, price) for price in prices]
 
+        prices = [1.19 * price for price in prices]
+
         (
             self.result.mean_price_kilowatt_hours_last_year_dynamic,
             self.result.min_price_kilowatt_hours_last_year_dynamic,
