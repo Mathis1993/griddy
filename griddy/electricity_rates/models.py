@@ -60,6 +60,30 @@ class Result(TrackCreationAndUpdates):
     electricity_costs_last_year_dynamic = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, blank=True, default=None
     )
+    basic_provider_fees_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    basic_grid_fees_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    electricity_costs_electric_car_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    electricity_costs_household_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    kilowatt_hours_electric_car_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    kilowatt_hours_household_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    mean_price_kilowatt_hours_electric_car_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
+    mean_price_kilowatt_hours_household_last_year_dynamic = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True, default=None
+    )
     mean_price_kilowatt_hours_last_year_dynamic = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, blank=True, default=None
     )

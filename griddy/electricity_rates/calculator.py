@@ -4,9 +4,8 @@ from datetime import datetime, timedelta
 from functools import cached_property
 from typing import List, Tuple
 
-from dateutil.utils import today
 from electricity_rates.models import BasicInput, Result
-from external.models import SpotPriceAverageLastYear, SpotPriceHourly
+from external.models import SpotPriceHourly
 
 BASIC_FEE_MONTHLY_DYNAMIC_TIBBER_EURO = 6
 TAX_PER_KILOWATT_HOUR_CENTS = 6.4
@@ -71,12 +70,12 @@ class Calculator:
             return
 
         # net costs
-        electric_car_kilowatt_hours, electric_car_charging_costs = (
+        kilowatt_hours_electric_car, charging_costs_electric_car = (
             self.calculate_kwh_and_charging_costs_electric_car()
         )
 
         kilowatt_hours_household = (
-            float(self.basic_input.kilowatt_hours_last_year_static) - electric_car_kilowatt_hours
+            float(self.basic_input.kilowatt_hours_last_year_static) - kilowatt_hours_electric_car
         )
         costs_household = self.calculate_costs_household(kilowatt_hours_household)
 
@@ -85,16 +84,36 @@ class Calculator:
             kilowatt_hours_household, costs_household
         )
         consumption_costs_electric_car = self.add_tax_and_grid_fee_to_costs(
-            electric_car_kilowatt_hours, electric_car_charging_costs
+            kilowatt_hours_electric_car, charging_costs_electric_car
         )
 
         # basic fees
-        basic_fees = self.calculate_basic_fees()
+        basic_grid_fees, basic_provider_fees = self.calculate_basic_fees()
+        basic_fees = basic_grid_fees + basic_provider_fees
 
         # brutto costs
-        consumption_costs = (consumption_costs_household + consumption_costs_electric_car) / 100
-        total_costs = 1.19 * (consumption_costs + basic_fees)
+        brutto_costs_electric_car = 1.19 * consumption_costs_electric_car
+        brutto_costs_household = 1.19 * consumption_costs_household
+        total_costs = ((brutto_costs_electric_car + brutto_costs_household) / 100) + basic_fees
+
         self.result.electricity_costs_last_year_dynamic = round(total_costs, 2)
+        self.result.basic_provider_fees_last_year_dynamic = round(basic_provider_fees, 2)
+        self.result.basic_grid_fees_last_year_dynamic = round(basic_grid_fees, 2)
+        self.result.electricity_costs_electric_car_last_year_dynamic = round(
+            brutto_costs_electric_car / 100, 2
+        )
+        self.result.electricity_costs_household_last_year_dynamic = round(
+            brutto_costs_household / 100, 2
+        )
+        self.result.kilowatt_hours_electric_car_last_year_dynamic = kilowatt_hours_electric_car
+        self.result.kilowatt_hours_household_last_year_dynamic = kilowatt_hours_household
+        if self.basic_input.electric_car:
+            self.result.mean_price_kilowatt_hours_electric_car_last_year_dynamic = round(
+                brutto_costs_electric_car / kilowatt_hours_electric_car, 2
+            )
+        self.result.mean_price_kilowatt_hours_household_last_year_dynamic = round(
+            brutto_costs_household / kilowatt_hours_household, 2
+        )
 
     # ToDo(ME-23.12.24): Validate this is correct
     def calculate_price_range(self):
@@ -132,9 +151,7 @@ class Calculator:
         if self.basic_input.electric_car is None:
             return 0.0, 0.0
 
-        # ToDo(ME-23.12.24): Return result object also containing mean ct/kWh
-        #  for charging electric car and potential warnings
-        electric_car_kilowatt_hours, electric_car_charging_costs = (
+        kilowatt_hours_electric_car, charging_costs_electric_car = (
             self.basic_input.electric_car.calculate_charging_costs(
                 self.basic_input.electric_car_charging_frequency,
                 self.basic_input.get_electric_car_charging_weekdays(),
@@ -143,9 +160,8 @@ class Calculator:
                 winter_half_only=self.basic_input.electric_car_charging_with_solar_power,
             )
         )
-        return electric_car_kilowatt_hours, electric_car_charging_costs
+        return kilowatt_hours_electric_car, charging_costs_electric_car
 
-    # ToDo(ME-23.12.24): Return result object also containing mean ct/kWh for household consumption
     def calculate_costs_household(self, kilowatt_hours_household: float) -> float:
         # solar system + battery -> 75% of kilowatt_hours_household in winter half
         # solar system -> 65% of kilowatt_hours_household in winter half
@@ -286,5 +302,7 @@ class Calculator:
             kilowatt_hours * (tax + float(self.grid_fee.grid_fee_per_kilowatt_hour_cents))
         )
 
-    def calculate_basic_fees(self) -> float:
-        return float(self.grid_fee.basic_grid_fee_yearly_euro + 12 * self.basic_fee_monthly_dynamic)
+    def calculate_basic_fees(self) -> Tuple[float, float]:
+        return float(self.grid_fee.basic_grid_fee_yearly_euro), float(
+            12 * self.basic_fee_monthly_dynamic
+        )
