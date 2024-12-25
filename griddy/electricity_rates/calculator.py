@@ -132,21 +132,16 @@ class Calculator:
         if self.basic_input.electric_car is None:
             return 0.0, 0.0
 
-        electric_car_kilowatt_hours = (
-            self.basic_input.electric_car.calculate_charging_kilowatt_hours(
-                self.basic_input.electric_car_charging_frequency
-            )
-        )
-        # If charging with solar power, consider only the year's winter half for charging events
-        if winter_half_only := self.basic_input.electric_car_charging_with_solar_power:
-            electric_car_kilowatt_hours /= 2
-        # ToDo(ME-23.12.24): electric_car_kilowatt_hours calculation inside calculate_charging_costs
         # ToDo(ME-23.12.24): Return result object also containing mean ct/kWh
         #  for charging electric car and potential warnings
-        electric_car_charging_costs = self.basic_input.electric_car.calculate_charging_costs(
-            self.basic_input.electric_car_charging_frequency,
-            self.basic_input.get_electric_car_charging_weekdays(),
-            winter_half_only=winter_half_only,
+        electric_car_kilowatt_hours, electric_car_charging_costs = (
+            self.basic_input.electric_car.calculate_charging_costs(
+                self.basic_input.electric_car_charging_frequency,
+                self.basic_input.get_electric_car_charging_weekdays(),
+                # If charging with solar power, consider only the year's winter half
+                # for charging events
+                winter_half_only=self.basic_input.electric_car_charging_with_solar_power,
+            )
         )
         return electric_car_kilowatt_hours, electric_car_charging_costs
 

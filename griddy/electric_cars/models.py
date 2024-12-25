@@ -1,6 +1,6 @@
 import random
 from datetime import date, datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from core.models import TrackCreationAndUpdates
 from django.db import models
@@ -46,7 +46,7 @@ class Car(TrackCreationAndUpdates):
         charging_frequency_per_month: int,
         preferred_weekdays: Optional[List[str]] = None,
         winter_half_only: bool = False,
-    ) -> float:
+    ) -> Tuple[int, float]:
         """
         Calculates the charging costs for the last [charging_months] months based on the charging frequency per month and historical data.
         The charging events per month are distributed over the last [charging_months] months.
@@ -54,6 +54,9 @@ class Car(TrackCreationAndUpdates):
         If preferred_weekdays are given, dates corresponding to these weekdays will be used for the calculation.
         Otherwise, dates with no restriction to weekdays will be used.
         """
+        kilowatt_hours = self.calculate_charging_kilowatt_hours(charging_frequency_per_month)
+        if winter_half_only:
+            kilowatt_hours /= 2
         charging_dates = sorted(
             [
                 charging_date
@@ -73,7 +76,7 @@ class Car(TrackCreationAndUpdates):
             )
         )
 
-        return charging_costs
+        return kilowatt_hours, charging_costs
 
     @staticmethod
     def pick_charging_dates(
