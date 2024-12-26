@@ -3,12 +3,10 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stromtarif-Vergleich</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.css"/>
 </head>
 <body class="bg-gray-50">
 <!-- Header Section -->
@@ -43,30 +41,30 @@
 
   <!-- Savings Overview Card -->
   <div class="mb-8">
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div class="p-6">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden relative">
+      <!-- Add gradient background -->
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-green-50"></div>
+      <div class="relative p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left side: Savings info -->
-<div class="flex flex-col md:flex-row justify-between items-center">
-  <div class="mb-4 md:mb-0">
-    <h2 class="text-2xl font-bold text-gray-900">Dein Sparpotential</h2>
-    <p class="text-gray-600">für dein Zuhause in {{ basic_input.zip_code }}</p>
-  </div>
-  <div class="text-center">
-    <span class="text-4xl font-bold {% if positive_savings %}text-green-600{% else %}text-red-600{% endif %}">
-      {{ savings|floatformat:2 }} €
-    </span>
-    <p class="text-sm text-gray-600">pro Jahr</p>
-  </div>
-</div>
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+              <h2 class="text-2xl font-bold text-gray-900">Dein Sparpotential</h2>
+              <p class="text-gray-600">für dein Zuhause in {{ basic_input.zip_code }}</p>
+            </div>
+            <div class="text-center">
+              <span class="text-4xl font-bold {% if positive_savings %}text-green-600{% else %}text-red-600{% endif %}">
+                {{ savings|floatformat:2 }} €
+              </span>
+              <p class="text-sm text-gray-600">pro Jahr</p>
+            </div>
+          </div>
 
           <!-- Right side: House illustration with feature icons -->
           <div class="relative">
             <!-- House base icon -->
             <div class="flex justify-center">
-              <svg class="w-32 h-32 text-gray-700"
-                   viewBox="0 0 24 24"
-                   fill="currentColor">
+              <svg class="w-32 h-32 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.83L19.17 12H4.83L12 4.83zM5 20v-6h14v6H5z"/>
               </svg>
             </div>
@@ -120,17 +118,19 @@
 
 <!-- Tariff Recommendation Card -->
 <div class="mb-8">
-  <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
     <div class="relative">
-      <!-- Decorative background pattern -->
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-green-50 opacity-50"></div>
+      <!-- Brighter gradient background -->
+      <div class="absolute inset-0 bg-gradient-to-r from-green-50 to-blue-50 opacity-75"></div>
+      <!-- Add subtle pattern overlay -->
+      <div class="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent"></div>
 
       <div class="relative p-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           <!-- Logo and Provider Info -->
           <div class="flex items-center space-x-4">
             <!-- Placeholder for company logo -->
-            <div class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center border-2 border-gray-200">
+            <div class="flex-shrink-0 w-16 h-16 bg-white/80 rounded-full flex items-center justify-center border-2 border-gray-200">
               <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
               </svg>
