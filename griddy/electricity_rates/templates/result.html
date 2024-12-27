@@ -181,57 +181,85 @@
     </div>
   </div>
 
-  <!-- Detailed Comparison -->
-  <div class="mb-8">
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div class="p-6">
-        <h3 class="text-xl font-semibold mb-6">Kostenvergleich im Detail</h3>
+<!-- Detailed Comparison -->
+<div class="mb-8">
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold">Kostenvergleich</h3>
+        <button onclick="toggleDetails()" class="group relative inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+          <span>Details anzeigen</span>
+          <svg id="chevron-icon" class="w-4 h-4 transition-transform duration-200 transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
 
-        <!-- Grid container -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-          <!-- Static Rate Side -->
-          <div class="relative p-6 bg-gray-50 rounded-xl">
-            <div class="space-y-4">
-              <div class="flex items-center space-x-3">
-                <div class="p-2 bg-gray-200 rounded-full">
-                  <svg class="w-6 h-6 text-gray-600"
-                       fill="currentColor"
-                       viewBox="0 0 20 20">
-                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
-                  </svg>
-                </div>
-                <h4 class="text-lg font-semibold text-gray-700">Statischer Tarif</h4>
+      <!-- Grid container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+        <!-- Static Rate Side -->
+        <div class="relative p-6 bg-gray-50 rounded-xl">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-3">
+              <div class="p-2 bg-gray-200 rounded-full">
+                <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+                </svg>
               </div>
-              <div class="text-3xl font-bold text-gray-900">
-                {{ result.electricity_costs_last_year_static }} €
-                <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
-              </div>
+              <h4 class="text-lg font-semibold text-gray-700">Statischer Tarif</h4>
+            </div>
+            <div class="text-3xl font-bold text-gray-900">
+              {{ result.electricity_costs_last_year_static }} €
+              <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
             </div>
           </div>
+        </div>
 
-          <!-- Dynamic Rate Side -->
-          <div class="relative p-6 bg-green-50 rounded-xl">
-            <div class="space-y-4">
-              <div class="flex items-center space-x-3">
-                <div class="p-2 bg-green-200 rounded-full">
-                  <svg class="w-6 h-6 text-green-600"
-                       fill="currentColor"
-                       viewBox="0 0 20 20">
-                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
-                  </svg>
-                </div>
-                <h4 class="text-lg font-semibold text-gray-700">Dynamischer Tarif</h4>
+        <!-- Dynamic Rate Side -->
+        <div class="relative p-6 bg-green-50 rounded-xl">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-3">
+              <div class="p-2 bg-green-200 rounded-full">
+                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+                </svg>
               </div>
-              <div class="text-3xl font-bold text-gray-900">
-                {{ result.electricity_costs_last_year_dynamic }} €
-                <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
-              </div>
+              <h4 class="text-lg font-semibold text-gray-700">Dynamischer Tarif</h4>
             </div>
+            <div class="text-3xl font-bold text-gray-900">
+              {{ result.electricity_costs_last_year_dynamic }} €
+              <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expandable Details Section -->
+      <div id="calculation-details" class="mt-6 hidden">
+        {# ToDo: Include details template #}
+        <div class="h-px bg-gray-200 my-6"></div>
+        <div class="rounded-lg bg-gray-50 p-4">
+          <h4 class="font-semibold text-gray-700 mb-4">Berechnungsdetails</h4>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Grundgebühr (monatlich)</span>
+              <span class="font-medium">{{ basic_input.basic_fee_monthly_static }} €</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Arbeitspreis pro kWh</span>
+              <span class="font-medium">{{ basic_input.kilowatt_hour_rate_static }} ct</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Jahresverbrauch</span>
+              <span class="font-medium">{{ basic_input.kilowatt_hours_last_year_static }} kWh</span>
+            </div>
+            <!-- Add more calculation details as needed -->
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 
   <!-- Price Details for Dynamic Rate -->
@@ -254,3 +282,42 @@
   </div>
 
 {% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+
+  <script>
+function toggleDetails() {
+  const details = document.getElementById('calculation-details');
+  const chevron = document.getElementById('chevron-icon');
+
+  if (details.classList.contains('hidden')) {
+    details.classList.remove('hidden');
+    details.classList.add('animate-fade-in');
+    chevron.classList.add('rotate-90');
+  } else {
+    details.classList.add('hidden');
+    chevron.classList.remove('rotate-90');
+  }
+}
+</script>
+
+<style>
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+
+
+{% endblock javascript %}
