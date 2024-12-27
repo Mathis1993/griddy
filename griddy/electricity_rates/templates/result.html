@@ -1,43 +1,13 @@
+{% extends "_base.html" %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stromtarif-Vergleich</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.css"/>
-</head>
-<body class="bg-gray-50">
-<!-- Header Section -->
-<header class="bg-white shadow-sm sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-    <h1 class="text-3xl font-bold text-gray-900">Deine Stromtarif-Analyse</h1>
-  </div>
-</header>
 
-<!-- Add a spacer to prevent content from jumping when header becomes sticky -->
-<div class="h-1"></div>
+<!-- Messages -->
+{% block messages %}
+  {% include "_messages.html" with message_emoji="🎉" %}
+{% endblock messages %}
 
-<!-- Main Content -->
-<main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-  <!-- Messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="mb-8">
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-5 dark:bg-slate-900 dark:border-gray-700">
-          <div class="flex justify-between items-center gap-x-3 text-center text-gray-800 dark:text-gray-200">
-            <span class="text-lg font-semibold">{{ message }}</span>
-            {% if positive_savings %}
-              <div class="animate-bounce">
-                🎉
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
+{% block content %}
 
   <!-- Savings Overview Card -->
   <div class="mb-8">
@@ -50,6 +20,7 @@
           <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="mb-4 md:mb-0">
               <h2 class="text-2xl font-bold text-gray-900">Dein Sparpotential</h2>
+              {# ToDo: Translate zip code to town #}
               <p class="text-gray-600">für dein Zuhause in {{ basic_input.zip_code }}</p>
             </div>
             <div class="text-center">
@@ -62,9 +33,12 @@
 
           <!-- Right side: House illustration with feature icons -->
           <div class="relative">
+            {# ToDo: Real house illustration #}
             <!-- House base icon -->
             <div class="flex justify-center">
-              <svg class="w-32 h-32 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-32 h-32 text-gray-700"
+                   viewBox="0 0 24 24"
+                   fill="currentColor">
                 <path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.83L19.17 12H4.83L12 4.83zM5 20v-6h14v6H5z"/>
               </svg>
             </div>
@@ -116,119 +90,148 @@
     </div>
   </div>
 
-<!-- Tariff Recommendation Card -->
-<div class="mb-8">
-  <div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <div class="relative">
-      <!-- Brighter gradient background -->
-      <div class="absolute inset-0 bg-gradient-to-r from-green-50 to-blue-50 opacity-75"></div>
-      <!-- Add subtle pattern overlay -->
-      <div class="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent"></div>
+  <!-- Tariff Recommendation Card -->
+  <div class="mb-8">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="relative">
+        <!-- Brighter gradient background -->
+        <div class="absolute inset-0 bg-gradient-to-r from-green-50 to-blue-50 opacity-75"></div>
+        <!-- Add subtle pattern overlay -->
+        <div class="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent"></div>
 
-      <div class="relative p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-          <!-- Logo and Provider Info -->
-          <div class="flex items-center space-x-4">
-            <!-- Placeholder for company logo -->
-            <div class="flex-shrink-0 w-16 h-16 bg-white/80 rounded-full flex items-center justify-center border-2 border-gray-200">
-              <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold text-gray-900">Dein Tarifvorschlag</h3>
-              <p class="text-sm text-gray-600">Dynamischer Stromtarif</p>
-            </div>
-          </div>
-
-          <!-- Key Benefits -->
-          <div class="space-y-2">
-            <div class="flex items-center space-x-2">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-gray-700">Stündlich aktualisierte Preise</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-gray-700">Keine Mindestvertragslaufzeit</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-gray-700">Monatlich kündbar</span>
-            </div>
-          </div>
-
-          <!-- CTA Button -->
-          <div class="flex justify-center md:justify-end">
-            <a href="#" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
-              Zum Anbieter
-              <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Optional: Decorative corner accent -->
-      <div class="absolute top-0 right-0 -mt-2 -mr-2 w-20 h-20 transform rotate-45 bg-gradient-to-br from-green-400 to-blue-500 opacity-10"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Detailed Comparison -->
-<div class="mb-8">
-  <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-    <div class="p-6">
-      <h3 class="text-xl font-semibold mb-6 text-center">Kostenvergleich im Detail</h3>
-
-      <!-- Grid container -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-        <!-- Static Rate Side -->
-        <div class="relative p-6 bg-gray-50 rounded-xl">
-          <div class="space-y-4">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-gray-200 rounded-full">
-                <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+        <div class="relative p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <!-- Logo and Provider Info -->
+            <div class="flex items-center space-x-4">
+              <!-- Placeholder for company logo -->
+              <div class="flex-shrink-0 w-16 h-16 bg-white/80 rounded-full flex items-center justify-center border-2 border-gray-200">
+                <svg class="w-10 h-10 text-gray-400"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h4 class="text-lg font-semibold text-gray-700">Statischer Tarif</h4>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900">Dein Tarifvorschlag</h3>
+                <p class="text-sm text-gray-600">Dynamischer Stromtarif</p>
+              </div>
             </div>
-            <div class="text-3xl font-bold text-gray-900">
-              {{ result.electricity_costs_last_year_static }} €
-              <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
+
+            <!-- Key Benefits -->
+            <div class="space-y-2">
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-green-500"
+                     fill="currentColor"
+                     viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"/>
+                </svg>
+                <span class="text-gray-700">Stündlich aktualisierte Preise</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-green-500"
+                     fill="currentColor"
+                     viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"/>
+                </svg>
+                <span class="text-gray-700">Keine Mindestvertragslaufzeit</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-green-500"
+                     fill="currentColor"
+                     viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"/>
+                </svg>
+                <span class="text-gray-700">Monatlich kündbar</span>
+              </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="flex justify-center md:justify-end">
+              {# ToDo: Link to supplier #}
+              <a href="#"
+                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                Zum Anbieter
+                <svg class="ml-2 -mr-1 w-5 h-5"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+              </a>
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Rate Side -->
-        <div class="relative p-6 bg-green-50 rounded-xl">
-          <div class="space-y-4">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-green-200 rounded-full">
-                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
-                </svg>
-              </div>
-              <h4 class="text-lg font-semibold text-gray-700">Dynamischer Tarif</h4>
-            </div>
-            <div class="text-3xl font-bold text-gray-900">
-              {{ result.electricity_costs_last_year_dynamic }} €
-              <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
-            </div>
-          </div>
-        </div>
+        <!-- Optional: Decorative corner accent -->
+        <div class="absolute top-0 right-0 -mt-2 -mr-2 w-20 h-20 transform rotate-45 bg-gradient-to-br from-green-400 to-blue-500 opacity-10"></div>
       </div>
     </div>
   </div>
-</div>
 
+  <!-- Detailed Comparison -->
+  <div class="mb-8">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="p-6">
+        <h3 class="text-xl font-semibold mb-6">Kostenvergleich im Detail</h3>
+
+        <!-- Grid container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+          <!-- Static Rate Side -->
+          <div class="relative p-6 bg-gray-50 rounded-xl">
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 bg-gray-200 rounded-full">
+                  <svg class="w-6 h-6 text-gray-600"
+                       fill="currentColor"
+                       viewBox="0 0 20 20">
+                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+                  </svg>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-700">Statischer Tarif</h4>
+              </div>
+              <div class="text-3xl font-bold text-gray-900">
+                {{ result.electricity_costs_last_year_static }} €
+                <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Rate Side -->
+          <div class="relative p-6 bg-green-50 rounded-xl">
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 bg-green-200 rounded-full">
+                  <svg class="w-6 h-6 text-green-600"
+                       fill="currentColor"
+                       viewBox="0 0 20 20">
+                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+                  </svg>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-700">Dynamischer Tarif</h4>
+              </div>
+              <div class="text-3xl font-bold text-gray-900">
+                {{ result.electricity_costs_last_year_dynamic }} €
+                <span class="text-sm font-normal text-gray-600 block">pro Jahr</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Price Details for Dynamic Rate -->
@@ -249,8 +252,5 @@
       </div>
     </div>
   </div>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/preline/dist/preline.js"></script>
-</body>
-</html>
+{% endblock content %}

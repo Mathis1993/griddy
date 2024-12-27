@@ -23,14 +23,27 @@
   {% endblock %}
 </head>
 
-<body class="bg-base-200">
+<body class="bg-gray-50">
+<!-- Header Section -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-gray-900">Deine Stromtarif-Analyse</h1>
+  </div>
+</header>
+
+
+<!-- Add a spacer to prevent content from jumping when header becomes sticky -->
+<div class="h-1"></div>
+
 <main id="main"
-      class="container mx-auto px-4 py-6">
+      class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
   {% include "_csrf.html" %}
   {% block nav %}
     {% include "_nav.html" %}
   {% endblock nav %}
-  {% include "_messages.html" %}
+  {% block messages %}
+    {% include "_messages.html" %}
+  {% endblock messages %}
   {% block content %}
     <p>Default content...</p>
   {% endblock content %}
@@ -46,7 +59,8 @@
 
 {% block javascript %}
   <!-- HTMX -->
-  <script defer src="{% static 'js/htmx.min.js' %}"></script>
+  <script defer
+          src="{% static 'js/htmx.min.js' %}"></script>
   <!-- Preline JS -->
   <script src="{% static 'js/vendored/main.js' %}"></script>
   <!-- Project JS -->
