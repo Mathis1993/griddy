@@ -1,6 +1,8 @@
+from lib2to3.fixes.fix_input import context
+
 from django.conf import settings
 from django.contrib import messages
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
     BasicFeeMonthlyStaticForm,
@@ -159,6 +161,7 @@ class CalculatorView(FormView):
             result_data = self.handle_completion()
             self.template_name = "result.html"
             context = self.get_context_data()
+            context["basic_input"] = result_data.get("basic_input")
             context["result"] = result_data.get("result")
             context["savings"] = result_data.get("savings")
             context["positive_savings"] = result_data.get("positive_savings")
@@ -264,7 +267,33 @@ class CalculatorView(FormView):
         result = calculator.calculate_costs()
         savings, positive_savings = result.potential_savings()
         return {
+            "basic:input": basic_input,
             "result": result,
             "savings": savings,
             "positive_savings": positive_savings,
         }
+
+
+class ResultView(TemplateView):
+    template_name = "result.html"
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        basic_input = BasicInput.objects.last()
+        calculator = Calculator(basic_input=basic_input)
+        result = calculator.calculate_costs()
+        savings, positive_savings = result.potential_savings()
+        context_data["basic_input"] = basic_input
+        context_data["result"] = result
+        context_data["savings"] = savings
+        context_data["positive_savings"] = positive_savings
+        messages.add_message(
+            self.request,
+            (
+                settings.CONFETTI_MESSAGE_LEVEL
+                if context_data["positive_savings"]
+                else messages.SUCCESS
+            ),
+            "Dein Ergebnis wurde berechnet!",
+        )
+        return context_data
