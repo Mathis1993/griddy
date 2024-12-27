@@ -141,6 +141,8 @@ class Calculator:
 
         prices = [1.19 * price for price in prices]
 
+        prices = [round(price, 2) for price in prices]
+
         (
             self.result.mean_price_kilowatt_hours_last_year_dynamic,
             self.result.min_price_kilowatt_hours_last_year_dynamic,
