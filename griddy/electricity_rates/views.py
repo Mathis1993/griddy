@@ -25,6 +25,7 @@ class CalculatorView(FormView):
     template_name = "calculator.html"
     form_class = ZipCodeForm
     form_template = "zip_code.html"
+    full_page_load = False
     flow = {
         "zip_code": FlowStep(
             form_class=ZipCodeForm,
@@ -135,6 +136,7 @@ class CalculatorView(FormView):
     def get(self, request, *args, **kwargs):
         # On a full page reload, stay on the current step
         # (render the initial template while including the current form)
+        self.full_page_load = True
         if "form_progress" in self.request.session:
             current_step = self.get_current_step()
             self.form_class = current_step.form_class
@@ -147,9 +149,9 @@ class CalculatorView(FormView):
         context = super().get_context_data(**kwargs)
         context["form_template"] = self.form_template
         context["progress_percentage"] = (
-            (step_number := self.get_current_step().number) / len(self.flow.keys()) * 100
+            self.get_current_step().number / len(self.flow.keys()) * 100
         )
-        context["first_step"] = step_number == 1
+        context["full_page_load"] = self.full_page_load
         return context
 
     def get_form_kwargs(self):

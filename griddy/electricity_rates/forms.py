@@ -39,7 +39,7 @@ class JsonSerializablePreviousResponsesForm(PreviousResponsesMixin, JsonSerializ
 
 class ZipCodeForm(JsonSerializablePreviousResponsesForm):
     zip_code = StyledCharField(
-        label="Wie lautet deine PLZ?", min_length=5, max_length=5, required=True
+        label="Wie lautet deine PLZ?", placeholder="PLZ", min_length=5, max_length=5, required=True
     )
 
     def clean_zip_code(self):
@@ -66,32 +66,34 @@ class NetworkOperatorForm(JsonSerializablePreviousResponsesForm):
 
     network_operator = forms.ModelChoiceField(
         queryset=NetworkOperator.objects.none(),
-        label="Netzbetreiber",
+        label="Wer ist dein Netzbetreiber?",
         required=True,
         widget=CustomSelectWidget,
     )
     network_operator.widget.attrs.update(
         {
-            "placeholder": "Wer ist dein Netzbetreiber?",
+            "placeholder": "Auswählen...",
         }
     )
 
 
 class BasicFeeMonthlyStaticForm(JsonSerializablePreviousResponsesForm):
     basic_fee_monthly_static = StyledIntegerField(
-        label="Aktuelle monatliche Grundgebühr in Euro", required=True
+        label="Wie hoch ist deine aktuelle monatliche Grundgebühr (in Euro)?",
+        placeholder="€",
+        required=True,
     )
 
 
 class KilowattHourRateStaticForm(JsonSerializablePreviousResponsesForm):
     kilowatt_hour_rate_static = StyledIntegerField(
-        label="Aktueller Preis pro kWh in Cent", required=True
+        label="Aktueller Preis pro kWh in Cent", placeholder="ct", required=True
     )
 
 
 class KilowattHoursLastYearStaticForm(JsonSerializablePreviousResponsesForm):
     kilowatt_hours_last_year_static = StyledIntegerField(
-        label="Verbrauch in kWh der letzten 12 Monate", required=True
+        label="Verbrauch in kWh der letzten 12 Monate", placeholder="kWh", required=True
     )
 
 
@@ -104,13 +106,13 @@ class ElectricCarExistsForm(JsonSerializablePreviousResponsesForm):
 class ElectricCarForm(JsonSerializablePreviousResponsesForm):
     electric_car = forms.ModelChoiceField(
         queryset=Car.objects.all(),
-        label="Elektroauto",
+        label="Welches Elektroauto hast du?",
         required=True,
         widget=CustomSelectWidget,
     )
     electric_car.widget.attrs.update(
         {
-            "placeholder": "Was für ein Elektroauto hast du?",
+            "placeholder": "Auswählen...",
         }
     )
 
@@ -118,7 +120,9 @@ class ElectricCarForm(JsonSerializablePreviousResponsesForm):
 class ChargingFrequencyForm(JsonSerializablePreviousResponsesForm):
     # ToDo(ME-04.12.24): Check if electric_car_kilowatt_hours is an abnormally big amount of or even more than the total kilowatt_hours_last_year_static
     charging_frequency = StyledIntegerField(
-        label="Wie häufig lädst du dein Auto im Schnitt pro Monat zuhause?", required=True
+        label="Wie häufig lädst du dein Auto im Schnitt pro Monat zuhause?",
+        placeholder="Häufigkeit",
+        required=True,
     )
 
 
@@ -132,7 +136,7 @@ class ChargingSpecificWeekdaysForm(JsonSerializablePreviousResponsesForm):
 
 class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
     charging_weekdays = forms.MultipleChoiceField(
-        label="Ladetage",
+        label="Welche Wochentage sind das?",
         required=True,
         choices=(
             ("monday", "Montag"),
@@ -147,7 +151,7 @@ class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
     )
     charging_weekdays.widget.attrs.update(
         {
-            "placeholder": "Welche Wochentage sind das?",
+            "placeholder": "Auswählen...",
         }
     )
 

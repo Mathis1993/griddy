@@ -3,7 +3,7 @@ import json
 from django import forms
 from django.db import models
 
-STYLED_FORM_CLASSES = "py-2.5 px-4 block w-full border-transparent rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-transparent dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+STYLED_FORM_CLASSES = "py-2.5 px-4 block w-full border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-0 dark:bg-neutral-900 dark:border-gray-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:border-blue-500"
 
 
 class JsonSerializableForm(forms.Form):
@@ -46,11 +46,12 @@ class PreviousResponsesMixin:
 
 class StyledFieldMixin:
     def __init__(self, *args, **kwargs):
+        placeholder = kwargs.pop("placeholder", "")
         super().__init__(*args, **kwargs)
         self.widget.attrs.update(
             {
                 "class": STYLED_FORM_CLASSES,
-                "placeholder": f"{self.label}",
+                "placeholder": placeholder,
             }
         )
 

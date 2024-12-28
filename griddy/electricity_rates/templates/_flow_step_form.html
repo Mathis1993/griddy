@@ -4,38 +4,42 @@
   <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-gray-200 dark:border-neutral-700">
     <!-- Input Section -->
     <div class="p-6">
-      <div class="flex gap-x-3">
-        <div class="w-full">
-          <label for="{{ field.id_for_label }}"
-                 class="block text-gray-500 dark:text-neutral-500">
-            <span class="sr-only">{{ field.label }}</span>
-          </label>
-          {{ field }}
+      <div class="space-y-3">
+        <!-- Label -->
+        <label for="{{ field.id_for_label }}"
+               class="block text-base text-center font-medium text-gray-600 dark:text-neutral-200">
+          {{ field.label }}
+        </label>
+        <!-- Input and Button -->
+        <div class="flex gap-x-3 w-full">
+          <div class="w-full min-w-0 {% if field.field.widget.input_type == 'checkbox' %}flex justify-center items-center{% endif %}">
+            {{ field }}
+          </div>
+          <div class="flex items-center">
+            <button class="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:bg-green-700 disabled:opacity-50 disabled:pointer-events-none"
+                    type="submit">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   height="24px"
+                   viewBox="0 -960 960 960"
+                   width="24px"
+                   fill="#FFFFFF">
+                <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div>
-          <button class="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                  type="submit">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 height="24px"
-                 viewBox="0 -960 960 960"
-                 width="24px"
-                 fill="#FFFFFF">
-              <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
 
-      <!-- Error messages -->
-      {% if field.errors %}
-        <div class="mt-3">
-          <ul class="text-sm text-red-600 dark:text-red-400">
-            {% for error in field.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
+        <!-- Error messages -->
+        {% if field.errors %}
+          <div class="mt-3">
+            <ul class="text-sm text-red-600 dark:text-red-400">
+              {% for error in field.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
     </div>
 
     <!-- Help Section -->
@@ -55,9 +59,7 @@
                stroke-width="2"
                stroke-linecap="round"
                stroke-linejoin="round">
-            <circle cx="12"
-                    cy="12"
-                    r="10"/>
+            <circle cx="12" cy="12" r="10"/>
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
             <path d="M12 17h.01"/>
           </svg>
@@ -89,6 +91,6 @@
   </div>
 </form>
 
-{% if not first_step %}
+{% if not full_page_load %}
   {% include "_progress_section.html" %}
 {% endif %}
