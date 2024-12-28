@@ -1,5 +1,3 @@
-from lib2to3.fixes.fix_input import context
-
 from django.conf import settings
 from django.contrib import messages
 from django.views.generic import FormView, TemplateView
@@ -38,26 +36,31 @@ class CalculatorView(FormView):
                 ).one_to_one_network_operator()
                 else "network_operator"
             ),
+            number=1,
         ),
         "network_operator": FlowStep(
             form_class=NetworkOperatorForm,
             template_name="network_operator.html",
             next=lambda _: "basic_fee_monthly_static",
+            number=2,
         ),
         "basic_fee_monthly_static": FlowStep(
             form_class=BasicFeeMonthlyStaticForm,
             template_name="basic_fee_monthly_static.html",
             next=lambda _: "kilowatt_hour_rate_static",
+            number=3,
         ),
         "kilowatt_hour_rate_static": FlowStep(
             form_class=KilowattHourRateStaticForm,
             template_name="kilowatt_hour_rate_static.html",
             next=lambda _: "kilowatt_hours_last_year_static",
+            number=4,
         ),
         "kilowatt_hours_last_year_static": FlowStep(
             form_class=KilowattHoursLastYearStaticForm,
             template_name="kilowatt_hours_last_year_static.html",
             next=lambda _: "electric_car_exists",
+            number=5,
         ),
         "electric_car_exists": FlowStep(
             form_class=ElectricCarExistsForm,
@@ -67,17 +70,20 @@ class CalculatorView(FormView):
                 if responses["electric_car_exists"]["electric_car_exists"] == "True"
                 else "solar_system_exists"
             ),
+            number=6,
         ),
         # ToDo(ME-29.11.24): Option to add multiple electric cars
         "electric_car": FlowStep(
             form_class=ElectricCarForm,
             template_name="electric_car.html",
             next=lambda _: "charging_frequency",
+            number=7,
         ),
         "charging_frequency": FlowStep(
             form_class=ChargingFrequencyForm,
             template_name="charging_frequency.html",
             next=lambda _: "charging_specific_weekdays",
+            number=8,
         ),
         "charging_specific_weekdays": FlowStep(
             form_class=ChargingSpecificWeekdaysForm,
@@ -87,11 +93,13 @@ class CalculatorView(FormView):
                 if responses["charging_specific_weekdays"]["charging_specific_weekdays"] == "True"
                 else "solar_system_exists"
             ),
+            number=9,
         ),
         "charging_weekdays": FlowStep(
             form_class=ChargingWeekdaysForm,
             template_name="charging_weekdays.html",
             next=lambda _: "solar_system_exists",
+            number=10,
         ),
         "solar_system_exists": FlowStep(
             form_class=SolarSystemExistsForm,
@@ -109,15 +117,18 @@ class CalculatorView(FormView):
                 )
                 else "battery_exists" if solar_system_exists else None
             ),
+            number=11,
         ),
         "charging_with_solar_power": FlowStep(
             form_class=ChargingWithSolarPowerForm,
             template_name="charging_with_solar_power.html",
             next=lambda _: "battery_exists",
+            number=12,
         ),
         "battery_exists": FlowStep(
             form_class=BatteryExistsForm,
             template_name="battery_exists.html",
+            number=13,
         ),
     }
 
@@ -128,11 +139,17 @@ class CalculatorView(FormView):
             current_step = self.get_current_step()
             self.form_class = current_step.form_class
             self.form_template = current_step.template_name
+        else:
+            self.request.session["form_progress"] = {"current_step": "zip_code", "responses": {}}
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form_template"] = self.form_template
+        context["progress_percentage"] = (
+            (step_number := self.get_current_step().number) / len(self.flow.keys()) * 100
+        )
+        context["first_step"] = step_number == 1
         return context
 
     def get_form_kwargs(self):
@@ -143,9 +160,6 @@ class CalculatorView(FormView):
         return form_kwargs
 
     def post(self, request, *args, **kwargs):
-        if "form_progress" not in self.request.session:
-            self.request.session["form_progress"] = {"current_step": "zip_code", "responses": {}}
-
         current_step = self.get_current_step()
         self.template_name = current_step.template_name
         self.form_class = current_step.form_class

@@ -22,6 +22,7 @@ class FlowStep:
     form_class: Union[Type[JsonSerializableForm], Type[JsonSerializableModelForm]]
     template_name: str
     next: Optional[Callable[[dict], str]] = None
+    number: int = 1
 
 
 class JsonSerializablePreviousResponsesForm(PreviousResponsesMixin, JsonSerializableForm):

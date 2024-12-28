@@ -1,38 +1,94 @@
-<form
-      hx-post=""
-      hx-swap="outerHTML"
->
+<form hx-post=""
+      hx-swap="outerHTML">
   {% csrf_token %}
-  <div class="relative z-10 flex flex-col gap-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-gray-900/20">
-  <!-- First row: Input and button -->
-    <div class="flex gap-x-3 p-3">
-    <div class="w-full">
-      <label for={{ field.id_for_label }}
-             class="block text-gray-500 dark:text-neutral-500 {% if show_label %}mb-2{% endif %}"><span {% if not show_label %}class="sr-only"{% endif %}>{{ field.label }}</span></label>
-      {{ field }}
+  <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-gray-200 dark:border-neutral-700">
+    <!-- Input Section -->
+    <div class="p-6">
+      <div class="flex gap-x-3">
+        <div class="w-full">
+          <label for="{{ field.id_for_label }}"
+                 class="block text-gray-500 dark:text-neutral-500">
+            <span class="sr-only">{{ field.label }}</span>
+          </label>
+          {{ field }}
+        </div>
+        <div>
+          <button class="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                  type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 height="24px"
+                 viewBox="0 -960 960 960"
+                 width="24px"
+                 fill="#FFFFFF">
+              <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error messages -->
+      {% if field.errors %}
+        <div class="mt-3">
+          <ul class="text-sm text-red-600 dark:text-red-400">
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
     </div>
-    <div>
-      <button class="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              type="submit">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             height="24px"
-             viewBox="0 -960 960 960"
-             width="24px"
-             fill="#FFFFFF">
-          <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
+
+    <!-- Help Section -->
+    <div class="border-t border-gray-200 dark:border-neutral-700">
+      <button type="button"
+              class="hs-collapse-toggle w-full px-6 py-3 inline-flex justify-between items-center gap-x-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800 transition-colors"
+              id="help-collapse-{{ field.auto_id }}"
+              data-hs-collapse="#help-content-{{ field.auto_id }}">
+        <div class="flex items-center gap-x-2">
+          <svg class="size-4"
+               xmlns="http://www.w3.org/2000/svg"
+               width="24"
+               height="24"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2"
+               stroke-linecap="round"
+               stroke-linejoin="round">
+            <circle cx="12"
+                    cy="12"
+                    r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <path d="M12 17h.01"/>
+          </svg>
+          <span class="hs-collapse-open:hidden">Genauere Erklärung gewünscht?</span>
+          <span class="hs-collapse-open:block hidden">Erklärung zuklappen</span>
+        </div>
+        <svg class="hs-collapse-open:rotate-180 size-4 text-gray-500"
+             xmlns="http://www.w3.org/2000/svg"
+             width="24"
+             height="24"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="m6 9 6 6 6-6"/>
         </svg>
       </button>
+
+      <div id="help-content-{{ field.auto_id }}"
+           class="hs-collapse hidden overflow-hidden transition-[height] duration-300"
+           aria-labelledby="help-collapse-{{ field.auto_id }}">
+        <div class="px-6 py-4 text-sm text-gray-600 bg-gray-50 dark:bg-neutral-800 dark:text-neutral-300 border-t border-gray-200 dark:border-neutral-700">
+          {{ field.help_text|default:"Ups, hier müssen wir noch eine genauere Erklärung einfügen." }}
+        </div>
+      </div>
     </div>
   </div>
-  <!-- Second row: Error messages -->
-  {% if field.errors %}
-  <div class="px-3 pb-3">
-    <ul class="errorlist mt-2 text-left text-red-600">
-      {% for error in field.errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-  </div>
 </form>
+
+{% if not first_step %}
+  {% include "_progress_section.html" %}
+{% endif %}
