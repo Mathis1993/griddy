@@ -109,7 +109,7 @@ class BasicFeeMonthlyStaticForm(JsonSerializablePreviousResponsesForm):
 
 class KilowattHourRateStaticForm(JsonSerializablePreviousResponsesForm):
     kilowatt_hour_rate_static = StyledIntegerField(
-        label="Aktueller Preis pro kWh in Cent", placeholder="ct", required=True
+        label="Aktueller Preis pro kWh (in Cent)", placeholder="ct", required=True
     )
     kilowatt_hour_rate_static.help_text = HELP_TEXT_KILOWATT_HOUR_RATE_STATIC
 
