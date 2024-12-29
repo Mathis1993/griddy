@@ -177,3 +177,6 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
     CONFETTI_MESSAGE_LEVEL: "success",
 }
+
+# Encryption
+FERNET_KEY = os.getenv("FERNET_KEY")

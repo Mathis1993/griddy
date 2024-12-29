@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional
 
-from core.models import TrackCreationAndUpdates
+from core.models import EncodePkMixin, TrackCreationAndUpdates
 from django.db import models
 from external.models import SpotPriceAverageLastYear
 
@@ -49,7 +49,7 @@ class BasicInput(TrackCreationAndUpdates):
         )
 
 
-class Result(TrackCreationAndUpdates):
+class Result(EncodePkMixin, TrackCreationAndUpdates):
     class Meta:
         db_table = "electricity_rates_results"
 

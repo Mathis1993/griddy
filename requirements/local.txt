@@ -12,6 +12,8 @@ build==1.2.1
     # via pip-tools
 certifi==2024.2.2
     # via requests
+cffi==1.17.1
+    # via cryptography
 cfgv==3.4.0
     # via pre-commit
 charset-normalizer==3.3.2
@@ -21,6 +23,8 @@ click==8.1.7
     #   black
     #   pip-tools
 crispy-tailwind==1.0.3
+    # via griddy (pyproject.toml)
+cryptography==44.0.0
     # via griddy (pyproject.toml)
 distlib==0.3.8
     # via virtualenv
@@ -67,6 +71,8 @@ pre-commit==3.3.2
     # via griddy (pyproject.toml)
 psycopg2-binary==2.9.6
     # via griddy (pyproject.toml)
+pycparser==2.22
+    # via cffi
 pyproject-hooks==1.0.0
     # via
     #   build

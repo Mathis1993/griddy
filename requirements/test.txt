@@ -8,11 +8,15 @@ asgiref==3.8.1
     # via django
 certifi==2024.2.2
     # via requests
+cffi==1.17.1
+    # via cryptography
 charset-normalizer==3.3.2
     # via requests
 coverage[toml]==7.5.0
     # via pytest-cov
 crispy-tailwind==1.0.3
+    # via griddy (pyproject.toml)
+cryptography==44.0.0
     # via griddy (pyproject.toml)
 django==5.0.4
     # via
@@ -52,6 +56,8 @@ pluggy==1.5.0
     # via pytest
 psycopg2-binary==2.9.6
     # via griddy (pyproject.toml)
+pycparser==2.22
+    # via cffi
 pytest==7.3.1
     # via
     #   griddy (pyproject.toml)

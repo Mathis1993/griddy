@@ -4,7 +4,11 @@
 
 <!-- Messages -->
 {% block messages %}
-  {% include "_messages.html" with message_emoji="🎉" %}
+  {% if positive_savings %}
+    {% include "_messages.html" with message_emoji="🎉" %}
+  {% else %}
+    {% include "_messages.html" with message_emoji="🙁" %}
+  {% endif %}
 {% endblock messages %}
 
 {% block content %}
@@ -19,9 +23,9 @@
           <!-- Left side: Savings info -->
           <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="mb-4 md:mb-0">
-              <h2 class="text-2xl font-bold text-gray-900">Dein Sparpotential</h2>
+              <h2 class="text-2xl font-bold text-gray-900 text-center">{% if positive_savings %}Dein Einsparpotential{% else %}Mehrkosten dynamischer Tarif{% endif %}</h2>
               {# ToDo: Translate zip code to town #}
-              <p class="text-gray-600">für dein Zuhause in {{ basic_input.zip_code }}</p>
+              <p class="text-gray-600 text-center">für dein Zuhause in {{ basic_input.zip_code }}</p>
             </div>
             <div class="text-center">
               <span class="text-4xl font-bold {% if positive_savings %}text-green-600{% else %}text-red-600{% endif %}">
@@ -90,6 +94,7 @@
     </div>
   </div>
 
+  {% if positive_savings %}
   <!-- Tariff Recommendation Card -->
   <div class="mb-8">
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -181,6 +186,8 @@
     </div>
   </div>
 
+  {% endif %}
+
 <!-- Detailed Comparison -->
 <div class="mb-8">
   <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -198,11 +205,11 @@
       <!-- Grid container -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
         <!-- Static Rate Side -->
-        <div class="relative p-6 bg-gray-50 rounded-xl">
+        <div class="relative p-6 {% if positive_savings %}bg-gray-50{% else %}bg-green-50{% endif %} rounded-xl">
           <div class="space-y-4">
             <div class="flex items-center space-x-3">
-              <div class="p-2 bg-gray-200 rounded-full">
-                <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+              <div class="p-2 {% if positive_savings %}bg-gray-200{% else %}bg-green-200{% endif %} rounded-full">
+                <svg class="w-6 h-6 {% if positive_savings %}text-gray-600{% else %}text-green-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
                 </svg>
               </div>
@@ -216,11 +223,11 @@
         </div>
 
         <!-- Dynamic Rate Side -->
-        <div class="relative p-6 bg-green-50 rounded-xl">
+        <div class="relative p-6 {% if positive_savings %}bg-green-50{% else %}bg-gray-50{% endif %} rounded-xl">
           <div class="space-y-4">
             <div class="flex items-center space-x-3">
-              <div class="p-2 bg-green-200 rounded-full">
-                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <div class="p-2 {% if positive_savings %}bg-green-200{% else %}bg-gray-200{% endif %} rounded-full">
+                <svg class="w-6 h-6 {% if positive_savings %}text-green-600{% else %}text-gray-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
                 </svg>
               </div>
@@ -264,7 +271,7 @@
 
   <!-- Price Details for Dynamic Rate -->
   <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-    <h3 class="text-xl font-semibold mb-6">Preisübersicht Dynamischer Tarif im letzten Jahr</h3>
+    <h3 class="text-xl font-semibold mb-6">Preisübersicht dynamischer Tarif im letzten Jahr</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="text-center p-4 bg-gray-50 rounded-lg">
         <span class="text-gray-600 block mb-2">Durchschnittspreis</span>
@@ -280,6 +287,24 @@
       </div>
     </div>
   </div>
+
+  <!-- New Calculation Button -->
+  <div class="flex justify-center mb-8">
+  <a href="{% url 'electricity_rates:calculator' %}"
+     class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+    <svg class="mr-2 -ml-1 w-5 h-5"
+         xmlns="http://www.w3.org/2000/svg"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor">
+      <path stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+    Neue Berechnung starten
+  </a>
+</div>
 
 {% endblock content %}
 

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse
 from django.views.generic import FormView, TemplateView
 from electricity_rates.calculator import Calculator
 from electricity_rates.forms import (
@@ -18,7 +19,7 @@ from electricity_rates.forms import (
     SolarSystemExistsForm,
     ZipCodeForm,
 )
-from electricity_rates.models import BasicInput, ZipCode
+from electricity_rates.models import BasicInput, Result, ZipCode
 
 
 class CalculatorView(FormView):
@@ -108,13 +109,13 @@ class CalculatorView(FormView):
             next=lambda responses: (
                 "charging_with_solar_power"
                 if (
-                    (
-                        solar_system_exists := responses["solar_system_exists"][
-                            "solar_system_exists"
-                        ]
-                        == "True"
-                    )
-                    and responses["electric_car_exists"]["electric_car_exists"] == "True"
+                        (
+                            solar_system_exists := responses["solar_system_exists"][
+                                                       "solar_system_exists"
+                                                   ]
+                                                   == "True"
+                        )
+                        and responses["electric_car_exists"]["electric_car_exists"] == "True"
                 )
                 else "battery_exists" if solar_system_exists else None
             ),
@@ -149,7 +150,7 @@ class CalculatorView(FormView):
         context = super().get_context_data(**kwargs)
         context["form_template"] = self.form_template
         context["progress_percentage"] = (
-            self.get_current_step().number / len(self.flow.keys()) * 100
+                (step := self.get_current_step()).number / len(self.flow.keys()) * 100
         )
         context["full_page_load"] = self.full_page_load
         return context
@@ -174,23 +175,13 @@ class CalculatorView(FormView):
         self.store_response(form)
         next_step = self.get_next_step()
         if not next_step:
-            result_data = self.handle_completion()
             self.template_name = "result.html"
             context = self.get_context_data()
-            context["basic_input"] = result_data.get("basic_input")
-            context["result"] = result_data.get("result")
-            context["savings"] = result_data.get("savings")
-            context["positive_savings"] = result_data.get("positive_savings")
-            messages.add_message(
-                self.request,
-                (
-                    settings.CONFETTI_MESSAGE_LEVEL
-                    if context["positive_savings"]
-                    else messages.SUCCESS
-                ),
-                "Dein Ergebnis wurde berechnet!",
-            )
-            return self.render_to_response(context)
+            result = self.handle_completion()
+            response = self.render_to_response(context)
+            response["HX-Redirect"] = (f"{reverse("electricity_rates:result")}"
+                                       f"?y={result.encode_pk()}")
+            return response
 
         self.template_name = next_step.template_name
         self.form_class = next_step.form_class
@@ -281,13 +272,7 @@ class CalculatorView(FormView):
         basic_input.save()
         calculator = Calculator(basic_input=basic_input)
         result = calculator.calculate_costs()
-        savings, positive_savings = result.potential_savings()
-        return {
-            "basic:input": basic_input,
-            "result": result,
-            "savings": savings,
-            "positive_savings": positive_savings,
-        }
+        return result
 
 
 class ResultView(TemplateView):
@@ -295,11 +280,11 @@ class ResultView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        basic_input = BasicInput.objects.last()
-        calculator = Calculator(basic_input=basic_input)
-        result = calculator.calculate_costs()
+        encoded = self.request.GET.get("y")
+        pk = Result.decode_pk(encoded)
+        result = Result.objects.get(pk=pk)
         savings, positive_savings = result.potential_savings()
-        context_data["basic_input"] = basic_input
+        context_data["basic_input"] = result.basic_input
         context_data["result"] = result
         context_data["savings"] = savings
         context_data["positive_savings"] = positive_savings
@@ -308,8 +293,9 @@ class ResultView(TemplateView):
             (
                 settings.CONFETTI_MESSAGE_LEVEL
                 if context_data["positive_savings"]
-                else messages.SUCCESS
+                else messages.WARNING
             ),
-            "Dein Ergebnis wurde berechnet!",
+            "Dein Einsparpotenzial wurde berechnet!" if context_data[
+                "positive_savings"] else "Leider kein Einsparpotenzial gefunden!",
         )
         return context_data
