@@ -153,8 +153,8 @@ class CalculatorView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form_template"] = self.form_template
-        context["progress_percentage"] = (
-                (step := self.get_current_step()).number / len(self.flow.keys()) * 100
+        context["progress_percentage"] = str(
+                self.get_current_step().number / len(self.flow.keys()) * 100
         )
         context["full_page_load"] = self.full_page_load
         return context
