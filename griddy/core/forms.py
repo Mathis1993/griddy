@@ -3,7 +3,7 @@ import json
 from django import forms
 from django.db import models
 
-STYLED_FORM_CLASSES = "py-2.5 px-4 block w-full border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-0 dark:bg-neutral-900 dark:border-gray-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:border-blue-500"
+STYLED_FORM_CLASSES = "w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white backdrop-blur-sm focus:border-green-500 !focus:outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-white/50 [&:focus]:border-green-500 [&:focus]:outline-none [&:focus]:ring-green-500/20"
 
 
 class JsonSerializableForm(forms.Form):
