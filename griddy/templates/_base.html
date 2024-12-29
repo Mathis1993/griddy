@@ -15,12 +15,15 @@
         content="">
   <link rel="shortcut icon"
         type="image/x-icon"
-        href="{% static 'images/favicon.ico' %}">
+        href="{% static 'images/griddy.webp' %}">
 
   {% block css %}
-    <link rel="stylesheet" href="{% static 'css/output.css' %}">
-    <link rel="stylesheet" href="{% static 'js/vendored/assets/main.css' %}">
-    <link rel="stylesheet" href="{% static 'js/vendored/assets/styles.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/output.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'js/vendored/assets/main.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'js/vendored/assets/styles.css' %}">
   {% endblock %}
 
   <!-- Custom Animation CSS -->
@@ -49,31 +52,32 @@
 
 <body class="animated-bg">
 
-  {% block nav %}
-    {% include "_nav.html" %}
-  {% endblock nav %}
+{% block nav %}
+  {% include "_nav.html" %}
+{% endblock nav %}
 
-    {% block progress_section %}
-      {% if progress_percentage %}
-        {% include "_progress_section.html" %}
-      {% endif %}
-    {% endblock progress_section %}
+{% block progress_section %}
+  {% if progress_percentage %}
+    {% include "_progress_section.html" %}
+  {% endif %}
+{% endblock progress_section %}
 
 
-<main id="main" class="flex-grow">
-<div class="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden">
+<main id="main"
+      class="flex-grow">
+  <div class="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden">
     <!-- Animated Background Elements -->
     <div class="absolute inset-0 z-0">
-        <div class="absolute w-96 h-96 bg-white/10 rounded-full -top-20 -left-20 animate-pulse"></div>
-        <div class="absolute w-96 h-96 bg-white/10 rounded-full -bottom-20 -right-20 animate-pulse delay-700"></div>
+      <div class="absolute w-96 h-96 bg-white/10 rounded-full -top-20 -left-20 animate-pulse"></div>
+      <div class="absolute w-96 h-96 bg-white/10 rounded-full -bottom-20 -right-20 animate-pulse delay-700"></div>
     </div>
-<div class="relative z-10 w-full min-w-0">
-  {% include "_csrf.html" %}
-  {% block content %}
-    <p>Default content...</p>
-  {% endblock content %}
-</div>
-</div>
+    <div class="relative z-10 w-full min-w-0">
+      {% include "_csrf.html" %}
+      {% block content %}
+        <p>Default content...</p>
+      {% endblock content %}
+    </div>
+  </div>
 </main>
 
 {% block footer %}

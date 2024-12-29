@@ -2163,6 +2163,10 @@ select {
   width: 2rem;
 }
 
+.w-auto {
+  width: auto;
+}
+
 .min-w-0 {
   min-width: 0px;
 }
@@ -2457,6 +2461,10 @@ select {
 
 .rounded-xl {
   border-radius: 0.75rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
 }
 
 .rounded-b-lg {
@@ -2853,6 +2861,10 @@ select {
 
 .align-bottom {
   vertical-align: bottom;
+}
+
+.align-text-top {
+  vertical-align: text-top;
 }
 
 .\!text-sm {
@@ -3638,6 +3650,10 @@ input:focus {
 }
 
 @media (min-width: 640px) {
+  .sm\:inline-block {
+    display: inline-block;
+  }
+
   .sm\:flex {
     display: flex;
   }
