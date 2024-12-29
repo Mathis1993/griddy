@@ -14,6 +14,21 @@ from core.forms import (
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from electric_cars.models import Car
+from electricity_rates.constants import (
+    HELP_TEXT_BASIC_FEE_MONTHLY_STATIC,
+    HELP_TEXT_BATTERY_EXISTS,
+    HELP_TEXT_CHARGING_FREQUENCY,
+    HELP_TEXT_CHARGING_SPECIFIC_WEEKDAYS,
+    HELP_TEXT_CHARGING_WEEKDAYS,
+    HELP_TEXT_CHARGING_WITH_SOLAR_POWER,
+    HELP_TEXT_ELECTRIC_CAR,
+    HELP_TEXT_ELECTRIC_CAR_EXISTS,
+    HELP_TEXT_KILOWATT_HOUR_RATE_STATIC,
+    HELP_TEXT_KILOWATT_HOURS_LAST_YEAR_STATIC,
+    HELP_TEXT_NETWORK_OPERATOR,
+    HELP_TEXT_SOLAR_SYSTEM_EXISTS,
+    HELP_TEXT_ZIP_CODE,
+)
 from electricity_rates.models import NetworkOperator, ZipCode
 
 
@@ -39,8 +54,13 @@ class JsonSerializablePreviousResponsesForm(PreviousResponsesMixin, JsonSerializ
 
 class ZipCodeForm(JsonSerializablePreviousResponsesForm):
     zip_code = StyledCharField(
-        label="Wie lautet deine PLZ?", placeholder="PLZ", min_length=5, max_length=5, required=True
+        label="Wie lautet deine PLZ?",
+        placeholder="PLZ",
+        min_length=5,
+        max_length=5,
+        required=True,
     )
+    zip_code.help_text = HELP_TEXT_ZIP_CODE
 
     def clean_zip_code(self):
         zip_code = self.cleaned_data.get("zip_code")
@@ -70,6 +90,7 @@ class NetworkOperatorForm(JsonSerializablePreviousResponsesForm):
         required=True,
         widget=CustomSelectWidget,
     )
+    network_operator.help_text = HELP_TEXT_NETWORK_OPERATOR
     network_operator.widget.attrs.update(
         {
             "placeholder": "Auswählen...",
@@ -83,24 +104,28 @@ class BasicFeeMonthlyStaticForm(JsonSerializablePreviousResponsesForm):
         placeholder="€",
         required=True,
     )
+    basic_fee_monthly_static.help_text = HELP_TEXT_BASIC_FEE_MONTHLY_STATIC
 
 
 class KilowattHourRateStaticForm(JsonSerializablePreviousResponsesForm):
     kilowatt_hour_rate_static = StyledIntegerField(
         label="Aktueller Preis pro kWh in Cent", placeholder="ct", required=True
     )
+    kilowatt_hour_rate_static.help_text = HELP_TEXT_KILOWATT_HOUR_RATE_STATIC
 
 
 class KilowattHoursLastYearStaticForm(JsonSerializablePreviousResponsesForm):
     kilowatt_hours_last_year_static = StyledIntegerField(
         label="Verbrauch in kWh der letzten 12 Monate", placeholder="kWh", required=True
     )
+    kilowatt_hours_last_year_static.help_text = HELP_TEXT_KILOWATT_HOURS_LAST_YEAR_STATIC
 
 
 class ElectricCarExistsForm(JsonSerializablePreviousResponsesForm):
     electric_car_exists = CustomChoiceField(
         label="Hast du ein Elektroauto?", required=True, choices=((True, "Ja"), (False, "Nein"))
     )
+    electric_car_exists.help_text = HELP_TEXT_ELECTRIC_CAR_EXISTS
 
 
 class ElectricCarForm(JsonSerializablePreviousResponsesForm):
@@ -110,6 +135,7 @@ class ElectricCarForm(JsonSerializablePreviousResponsesForm):
         required=True,
         widget=CustomSelectWidget,
     )
+    electric_car.help_text = HELP_TEXT_ELECTRIC_CAR
     electric_car.widget.attrs.update(
         {
             "placeholder": "Auswählen...",
@@ -124,6 +150,7 @@ class ChargingFrequencyForm(JsonSerializablePreviousResponsesForm):
         placeholder="Häufigkeit",
         required=True,
     )
+    charging_frequency.help_text = HELP_TEXT_CHARGING_FREQUENCY
 
 
 class ChargingSpecificWeekdaysForm(JsonSerializablePreviousResponsesForm):
@@ -132,6 +159,7 @@ class ChargingSpecificWeekdaysForm(JsonSerializablePreviousResponsesForm):
         required=True,
         choices=((True, "Ja"), (False, "Nein")),
     )
+    charging_specific_weekdays.help_text = HELP_TEXT_CHARGING_SPECIFIC_WEEKDAYS
 
 
 class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
@@ -149,6 +177,7 @@ class ChargingWeekdaysForm(JsonSerializablePreviousResponsesForm):
         ),
         widget=CustomMultipleSelectWidget,
     )
+    charging_weekdays.help_text = HELP_TEXT_CHARGING_WEEKDAYS
     charging_weekdays.widget.attrs.update(
         {
             "placeholder": "Auswählen...",
@@ -164,6 +193,7 @@ class SolarSystemExistsForm(JsonSerializablePreviousResponsesForm):
     solar_system_exists = CustomChoiceField(
         label="Hast du eine Solaranlage?", required=True, choices=((True, "Ja"), (False, "Nein"))
     )
+    solar_system_exists.help_text = HELP_TEXT_SOLAR_SYSTEM_EXISTS
 
 
 class ChargingWithSolarPowerForm(JsonSerializablePreviousResponsesForm):
@@ -172,9 +202,11 @@ class ChargingWithSolarPowerForm(JsonSerializablePreviousResponsesForm):
         required=True,
         choices=((True, "Ja"), (False, "Nein")),
     )
+    charging_with_solar_power.help_text = HELP_TEXT_CHARGING_WITH_SOLAR_POWER
 
 
 class BatteryExistsForm(JsonSerializablePreviousResponsesForm):
     battery_exists = CustomChoiceField(
         label="Hast du einen Stromspeicher?", required=True, choices=((True, "Ja"), (False, "Nein"))
     )
+    battery_exists.help_text = HELP_TEXT_BATTERY_EXISTS
