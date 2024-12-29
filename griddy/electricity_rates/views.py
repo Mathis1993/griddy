@@ -22,6 +22,10 @@ from electricity_rates.forms import (
 from electricity_rates.models import BasicInput, Result, ZipCode
 
 
+class LandingView(TemplateView):
+    template_name = "landing.html"
+
+
 class CalculatorView(FormView):
     template_name = "calculator.html"
     form_class = ZipCodeForm
