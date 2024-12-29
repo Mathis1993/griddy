@@ -47,54 +47,10 @@
 </head>
 
 <body class="animated-bg">
-<!-- Header -->
-    <header class="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/10 border-b border-white/20">
-        <nav class="px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo/Home Link -->
-                <a href="{% url 'electricity_rates:landing' %}" class="text-white font-semibold text-xl">
-                    Stromtarif Rechner
-                </a>
 
-                <!-- Navigation Items -->
-                <div class="hidden sm:flex space-x-6">
-                    <a href="{% url 'electricity_rates:calculator' %}" class="text-white/90 hover:text-white transition-colors">
-                        Rechner
-                    </a>
-                    <a href="#" class="text-white/90 hover:text-white transition-colors">
-                        Über uns
-                    </a>
-                    <a href="#" class="text-white/90 hover:text-white transition-colors">
-                        Kontakt
-                    </a>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <button type="button" class="sm:hidden text-white" data-hs-overlay="#mobile-menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
-                    </svg>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="hs-overlay hidden w-full h-full fixed top-0 left-0 z-[60] overflow-x-hidden overflow-y-auto bg-black bg-opacity-60">
-        <div class="p-4 mt-16">
-            <div class="flex flex-col space-y-4 bg-white/10 backdrop-blur-lg rounded-lg p-4">
-                <a href="{% url 'electricity_rates:calculator' %}" class="text-white hover:text-white/80 transition-colors">
-                    Rechner
-                </a>
-                <a href="#" class="text-white hover:text-white/80 transition-colors">
-                    Über uns
-                </a>
-                <a href="#" class="text-white hover:text-white/80 transition-colors">
-                    Kontakt
-                </a>
-            </div>
-        </div>
-    </div>
+  {% block nav %}
+    {% include "_nav.html" %}
+  {% endblock nav %}
 
     {% block progress_section %}
       {% if progress_percentage %}
@@ -110,12 +66,8 @@
         <div class="absolute w-96 h-96 bg-white/10 rounded-full -top-20 -left-20 animate-pulse"></div>
         <div class="absolute w-96 h-96 bg-white/10 rounded-full -bottom-20 -right-20 animate-pulse delay-700"></div>
     </div>
-{#<div class="relative z-10 flex flex-col items-center space-y-8">#}
 <div class="relative z-10 w-full min-w-0">
   {% include "_csrf.html" %}
-  {% block nav %}
-    {% include "_nav.html" %}
-  {% endblock nav %}
   {% block content %}
     <p>Default content...</p>
   {% endblock content %}
