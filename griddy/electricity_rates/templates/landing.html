@@ -184,7 +184,11 @@
     <div class="swiper-pagination"></div>
   </div>
 
-{% endblock %}
+{% endblock content %}
+
+{# Overwrite footer as it is included manually here above #}
+{% block footer %}
+{% endblock footer %}
 
 {% block javascript %}
   {{ block.super }}
