@@ -3018,6 +3018,14 @@ select {
   opacity: 0;
 }
 
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
 .shadow-2xl {
   --tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
@@ -3213,6 +3221,20 @@ input:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* HTMX LOADING STATE */
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline-flex;
+}
+
+.htmx-request .htmx-request-indicator {
+  display: none;
 }
 
 .placeholder\:text-white\/50::-moz-placeholder {

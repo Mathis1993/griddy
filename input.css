@@ -56,3 +56,16 @@ input:focus {
     transform: translateY(0);
   }
 }
+
+/* HTMX LOADING STATE */
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline-flex;
+}
+
+.htmx-request .htmx-request-indicator {
+  display: none;
+}
