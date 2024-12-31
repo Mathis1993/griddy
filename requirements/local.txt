@@ -67,7 +67,7 @@ platformdirs==4.2.1
     # via
     #   black
     #   virtualenv
-pre-commit==3.3.2
+pre-commit==4.0.1
     # via griddy (pyproject.toml)
 psycopg2-binary==2.9.6
     # via griddy (pyproject.toml)
