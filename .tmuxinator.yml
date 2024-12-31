@@ -1,0 +1,20 @@
+name: griddy
+root: <%= Dir.pwd %>
+
+pre_window: source ~/venvs/griddy/bin/activate.fish
+
+windows:
+  - git:
+      layout: main-vertical
+      panes:
+        - lazygit:
+            - lazygit
+  - django:
+      layout: e251,150x42,0,0[150x6,0,0,2,150x35,0,7,3]
+      panes:
+        - tailwind:
+          - cd jstoolchain; npm run tailwind-watch
+        - django:
+          - dc up -d; sleep 5; python manage.py runserver
+      on_project_first: |
+        tmux resize-pane -t django.0 -D 80
