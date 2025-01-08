@@ -1,3 +1,5 @@
+import time
+
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
@@ -113,13 +115,13 @@ class CalculatorView(FormView):
             next=lambda responses: (
                 "charging_with_solar_power"
                 if (
-                        (
-                            solar_system_exists := responses["solar_system_exists"][
-                                                       "solar_system_exists"
-                                                   ]
-                                                   == "True"
-                        )
-                        and responses["electric_car_exists"]["electric_car_exists"] == "True"
+                    (
+                        solar_system_exists := responses["solar_system_exists"][
+                            "solar_system_exists"
+                        ]
+                        == "True"
+                    )
+                    and responses["electric_car_exists"]["electric_car_exists"] == "True"
                 )
                 else "battery_exists" if solar_system_exists else None
             ),
@@ -154,7 +156,7 @@ class CalculatorView(FormView):
         context = super().get_context_data(**kwargs)
         context["form_template"] = self.form_template
         context["progress_percentage"] = str(
-                self.get_current_step().number / len(self.flow.keys()) * 100
+            self.get_current_step().number / len(self.flow.keys()) * 100
         )
         context["full_page_load"] = self.full_page_load
         return context
@@ -276,6 +278,7 @@ class CalculatorView(FormView):
         basic_input.save()
         calculator = Calculator(basic_input=basic_input)
         result = calculator.calculate_costs()
+        time.sleep(settings.CALCULATION_EXTRA_DURATION)  # real important calculation, lol
         return result
 
 
@@ -299,7 +302,10 @@ class ResultView(TemplateView):
                 if context_data["positive_savings"]
                 else messages.WARNING
             ),
-            "Dein Einsparpotenzial wurde berechnet!" if context_data[
-                "positive_savings"] else "Leider kein Einsparpotenzial gefunden!",
+            (
+                "Dein Einsparpotenzial wurde berechnet!"
+                if context_data["positive_savings"]
+                else "Leider kein Einsparpotenzial gefunden!"
+            ),
         )
         return context_data
