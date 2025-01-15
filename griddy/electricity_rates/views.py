@@ -185,8 +185,9 @@ class CalculatorView(FormView):
             context = self.get_context_data()
             result = self.handle_completion()
             response = self.render_to_response(context)
-            response["HX-Redirect"] = (f"{reverse("electricity_rates:result")}"
-                                       f"?y={result.encode_pk()}")
+            base_result_url = reverse("electricity_rates:result")
+            result_url = f"{base_result_url}?y={result.encode_pk()}"
+            response["HX-Redirect"] = result_url
             return response
 
         self.template_name = next_step.template_name
@@ -278,7 +279,7 @@ class CalculatorView(FormView):
         basic_input.save()
         calculator = Calculator(basic_input=basic_input)
         result = calculator.calculate_costs()
-        time.sleep(settings.CALCULATION_EXTRA_DURATION)  # real important calculation, lol
+        time.sleep(settings.CALCULATION_EXTRA_DURATION_SECONDS)  # real important calculation, lol
         return result
 
 

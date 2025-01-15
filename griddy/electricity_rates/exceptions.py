@@ -1,3 +1,2 @@
-
 class QueryParamException(Exception):
     pass

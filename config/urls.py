@@ -18,7 +18,6 @@ Including another URLconf
 
 from django.urls import include, path
 
-
 urlpatterns = [
     path("", include("electricity_rates.urls", namespace="electricity_rates")),
 ]

@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-
 from external.models import SpotPriceHourly
 
 
@@ -15,4 +14,3 @@ def test_sport_price_hourly_import_prices():
 
     assert SpotPriceHourly.objects.exists()
     assert SpotPriceHourly.objects.count() == 48  # end is inclusive
-

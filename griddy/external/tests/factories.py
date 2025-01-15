@@ -1,6 +1,5 @@
 import factory.fuzzy
-
-from external.models import SpotPriceHourly, SpotPriceAverageLastYear
+from external.models import SpotPriceAverageLastYear, SpotPriceHourly
 
 
 class SpotPriceHourlyFactory(factory.django.DjangoModelFactory):

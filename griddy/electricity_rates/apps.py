@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class ElectricityRatesConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'electricity_rates'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "electricity_rates"
