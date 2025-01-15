@@ -2,6 +2,7 @@
 .idea
 .docker
 .env
+.env-docker
 
 # Mac
 .DS_Store
