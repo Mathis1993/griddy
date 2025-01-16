@@ -26,6 +26,8 @@ dependencies = [
     "crispy-tailwind==1.0.3",
     # ENCRYPTION
     "cryptography==44.0.0",
+    # DATA HANDLING
+    "pandas==2.2.3",
 ]
 
 [project.optional-dependencies]

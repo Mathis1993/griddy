@@ -54,11 +54,15 @@ mypy-extensions==1.0.0
     # via black
 nodeenv==1.8.0
     # via pre-commit
+numpy==2.2.1
+    # via pandas
 packaging==24.0
     # via
     #   black
     #   build
     #   gunicorn
+pandas==2.2.3
+    # via griddy (pyproject.toml)
 pathspec==0.12.1
     # via black
 pip-tools==7.4.1
@@ -77,20 +81,28 @@ pyproject-hooks==1.0.0
     # via
     #   build
     #   pip-tools
+python-dateutil==2.9.0.post0
+    # via pandas
 python-dotenv==1.0.0
     # via griddy (pyproject.toml)
 python-http-client==3.3.7
     # via sendgrid
+pytz==2024.2
+    # via pandas
 pyyaml==6.0.1
     # via pre-commit
 requests==2.31.0
     # via griddy (pyproject.toml)
 sendgrid==6.10.0
     # via griddy (pyproject.toml)
+six==1.17.0
+    # via python-dateutil
 sqlparse==0.5.0
     # via django
 starkbank-ecdsa==2.2.0
     # via sendgrid
+tzdata==2024.2
+    # via pandas
 urllib3==2.2.1
     # via requests
 virtualenv==20.26.0
