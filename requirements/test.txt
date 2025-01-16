@@ -30,6 +30,8 @@ django-crispy-forms==2.1
     #   griddy (pyproject.toml)
 django-extensions==3.2.3
     # via griddy (pyproject.toml)
+et-xmlfile==2.0.0
+    # via openpyxl
 execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.2.1
@@ -50,6 +52,8 @@ multidict==6.0.5
     # via yarl
 numpy==2.2.1
     # via pandas
+openpyxl==3.1.5
+    # via griddy (pyproject.toml)
 packaging==24.0
     # via
     #   gunicorn

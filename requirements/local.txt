@@ -40,6 +40,8 @@ django-crispy-forms==2.1
     #   griddy (pyproject.toml)
 django-extensions==3.2.3
     # via griddy (pyproject.toml)
+et-xmlfile==2.0.0
+    # via openpyxl
 filelock==3.13.4
     # via virtualenv
 gunicorn==21.2.0
@@ -56,6 +58,8 @@ nodeenv==1.8.0
     # via pre-commit
 numpy==2.2.1
     # via pandas
+openpyxl==3.1.5
+    # via griddy (pyproject.toml)
 packaging==24.0
     # via
     #   black
