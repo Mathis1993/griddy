@@ -40,7 +40,7 @@ A simple django project for calculating the effect of switching from a static to
   python manage.py runserver
   ```
 
-**Note: When running the calculation for the first time, it will take a while, because historical energy prices data has to be fetched.**
+**Note: When running the calculation for the first time, it will take a while, because historical energy price data has to be fetched.**
 
 ### JS Toolchain
 Concept: https://stackoverflow.com/questions/63392426/how-to-use-tailwindcss-with-django#63392427
