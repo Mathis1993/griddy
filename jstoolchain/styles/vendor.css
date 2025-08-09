@@ -1,0 +1,16 @@
+@import 'swiper/swiper-bundle.css';
+
+/* Custom Swiper styles */
+.swiper {
+  height: calc(100vh - 73px);
+}
+
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5);
+}
+.swiper-pagination-bullet-active {
+  background: white;
+}
+.swiper-pagination-vertical.swiper-pagination-bullets {
+  right: 0.25rem;
+}

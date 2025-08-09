@@ -8,11 +8,15 @@ asgiref==3.8.1
     # via django
 certifi==2024.2.2
     # via requests
+cffi==1.17.1
+    # via cryptography
 charset-normalizer==3.3.2
     # via requests
 coverage[toml]==7.5.0
     # via pytest-cov
 crispy-tailwind==1.0.3
+    # via griddy (pyproject.toml)
+cryptography==44.0.0
     # via griddy (pyproject.toml)
 django==5.0.4
     # via
@@ -26,6 +30,8 @@ django-crispy-forms==2.1
     #   griddy (pyproject.toml)
 django-extensions==3.2.3
     # via griddy (pyproject.toml)
+et-xmlfile==2.0.0
+    # via openpyxl
 execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.2.1
@@ -44,14 +50,22 @@ iniconfig==2.0.0
     # via pytest
 multidict==6.0.5
     # via yarl
+numpy==2.2.1
+    # via pandas
+openpyxl==3.1.5
+    # via griddy (pyproject.toml)
 packaging==24.0
     # via
     #   gunicorn
     #   pytest
+pandas==2.2.3
+    # via griddy (pyproject.toml)
 pluggy==1.5.0
     # via pytest
 psycopg2-binary==2.9.6
     # via griddy (pyproject.toml)
+pycparser==2.22
+    # via cffi
 pytest==7.3.1
     # via
     #   griddy (pyproject.toml)
@@ -77,10 +91,13 @@ python-dateutil==2.9.0.post0
     # via
     #   faker
     #   freezegun
+    #   pandas
 python-dotenv==1.0.0
     # via griddy (pyproject.toml)
 python-http-client==3.3.7
     # via sendgrid
+pytz==2024.2
+    # via pandas
 pyyaml==6.0.1
     # via vcrpy
 requests==2.31.0
@@ -93,6 +110,8 @@ sqlparse==0.5.0
     # via django
 starkbank-ecdsa==2.2.0
     # via sendgrid
+tzdata==2024.2
+    # via pandas
 urllib3==2.2.1
     # via requests
 vcrpy==6.0.1

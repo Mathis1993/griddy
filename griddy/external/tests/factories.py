@@ -1,25 +1,24 @@
-from datetime import timedelta
-
 import factory.fuzzy
-from django.utils import timezone
-from external.models import ApiConfig, ApiKey
+from external.models import SpotPriceAverageLastYear, SpotPriceHourly
 
 
-class ApiConfigFactory(factory.django.DjangoModelFactory):
+class SpotPriceHourlyFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = ApiConfig
-        django_get_or_create = ("name",)
+        model = SpotPriceHourly
+        django_get_or_create = ("at",)
 
-    name = factory.fuzzy.FuzzyChoice(ApiConfig.ApiNames.values)
-    base_url = factory.Faker("url")
+    price = factory.fuzzy.FuzzyDecimal(0.1, 1000.0)
+    at = factory.Faker("date_time_this_year")
+    electricity_unit = factory.fuzzy.FuzzyChoice([SpotPriceHourly.ElectricityUnit.choices])
+    currency_unit = factory.fuzzy.FuzzyChoice([SpotPriceHourly.CurrencyUnit.choices])
 
 
-class ApiKeyFactory(factory.django.DjangoModelFactory):
+class SpotPriceAverageLastYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = ApiKey
-        django_get_or_create = ("key",)
+        model = SpotPriceAverageLastYear
+        django_get_or_create = ("at",)
 
-    key = factory.Sequence(lambda n: f"api_key_{n}")
-    expiration = factory.LazyAttribute(lambda _: timezone.now() + timedelta(days=1))
-    user = factory.SubFactory("users.tests.factories.UserFactory")
-    api_config = factory.SubFactory(ApiConfigFactory)
+    price = factory.fuzzy.FuzzyDecimal(0.1, 1000.0)
+    at = factory.Faker("date_this_year")
+    electricity_unit = factory.fuzzy.FuzzyChoice([SpotPriceAverageLastYear.ElectricityUnit.choices])
+    currency_unit = factory.fuzzy.FuzzyChoice([SpotPriceAverageLastYear.CurrencyUnit.choices])

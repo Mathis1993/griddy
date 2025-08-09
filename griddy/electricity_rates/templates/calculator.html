@@ -1,0 +1,20 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Griddy{% endblock title %}
+
+{% block content %}
+  <!-- Content Container -->
+  <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+    <!-- Glass Effect Card -->
+    <div class="backdrop-blur-lg bg-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/20 min-w-0">
+
+      <p class="text-white text-center mb-10">
+        Beantworte ein paar Fragen, damit wir dein Einsaparpotenzial berechnen können.
+      </p>
+
+      <!-- Form Section -->
+      {% include form_template %}
+    </div>
+  </div>
+{% endblock content %}

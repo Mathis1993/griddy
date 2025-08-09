@@ -5,7 +5,10 @@ export default defineConfig({
     outDir: '../griddy/static/js/vendored',
     emptyOutDir: true,
     rollupOptions: {
-      input: 'main.js', // Path to entry file
+      input: {
+        main: 'main.js',
+        styles: 'styles/vendor.css'
+      },
       output: {
         // Disable Cache Busting here, as it will be Done by Django via the whitenoise
         // CompressedManifestStaticFilesStorage

@@ -8,45 +8,77 @@
         content="IE=edge,chrome=1">
   <meta name="viewport"
         content="width=device-width,minimum-scale=1,initial-scale=1">
-  <title>{% block title %}DjangoX{% endblock title %}</title>
+  <title>{% block title %}{% endblock title %}</title>
   <meta name="description"
         content="A framework for launching new Django projects quickly.">
   <meta name="author"
         content="">
   <link rel="shortcut icon"
         type="image/x-icon"
-        href="{% static 'images/favicon.ico' %}">
+        href="{% static 'images/griddy.webp' %}">
 
   {% block css %}
-  <link rel="stylesheet"
-        href="{% static 'css/output.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/output.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'js/vendored/assets/main.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'js/vendored/assets/styles.css' %}">
   {% endblock %}
 </head>
 
-<body class="bg-base-200">
-<main id="main" class="container mx-auto px-4 py-6">
-  {% include "_csrf.html" %}
-  {% block nav %}
-    {% include "_nav.html" %}
-  {% endblock nav %}
-  {% block content %}
-    <p>Default content...</p>
-  {% endblock content %}
-</main>
+<body class="animated-bg">
 
-<footer class="mt-auto w-full max-w-[85rem] py-10 px-4 sm:px-6 lg:px-8 mx-auto">
-  <div class="text-center">
-    <div class="mt-3">
-      <p class="text-gray-500 dark:text-neutral-500">© {% now "Y" %} - Griddy.</p>
+{% block nav %}
+  {% include "_nav.html" %}
+{% endblock nav %}
+
+{% block progress_section %}
+  {% if progress_percentage %}
+    {% include "_progress_section.html" %}
+  {% endif %}
+{% endblock progress_section %}
+
+
+<main id="main"
+      class="flex-grow">
+  <div class="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute w-96 h-96 bg-white/10 rounded-full -top-20 -left-20 animate-pulse"></div>
+      <div class="absolute w-96 h-96 bg-white/10 rounded-full -bottom-20 -right-20 animate-pulse delay-700"></div>
+    </div>
+    <div class="relative z-10 w-full min-w-0">
+      {% include "_csrf.html" %}
+      {% block content %}
+        <p>Default content...</p>
+      {% endblock content %}
     </div>
   </div>
-</footer>
+</main>
+
+{% block footer %}
+  {% include "_footer.html" %}
+{% endblock footer %}
 
 {% block javascript %}
-<!-- Preline JS -->
-<script src="{% static 'js/vendored/main.js' %}"></script>
-<!-- Project JS -->
-<script src="{% static 'js/base.js' %}"></script>
+  <!-- HTMX -->
+  <script defer
+          src="{% static 'js/htmx.min.js' %}"></script>
+  <!-- Preline JS -->
+  <script src="{% static 'js/vendored/main.js' %}"></script>
+  <!-- Project JS -->
+  <script src="{% static 'js/base.js' %}"></script>
+
+  <script>
+    // Initialize Preline components on page load
+    HSCollapse.autoInit();
+
+    // Re-initialize after HTMX swaps
+    document.addEventListener('htmx:afterSwap', function (event) {
+      HSCollapse.autoInit();
+    });
+  </script>
 
 {% endblock javascript %}
 

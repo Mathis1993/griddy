@@ -9,6 +9,7 @@ import os
 import sys
 from pathlib import Path
 
+from django.contrib import messages
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,7 +35,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,14 +43,15 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
+    "django.forms",
     # custom
     "core",
-    "devices",
-    "execution_conditions",
+    "electricity_rates",
+    "electric_cars",
     "external",
-    "netzentgelte",
-    "users",
     # third-party
     "django_extensions",
     "crispy_forms",
@@ -88,9 +89,9 @@ TEMPLATES = [
         },
     },
 ]
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "config.wsgi.application"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -110,24 +111,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "de"
 
-
 TIME_ZONE = "Europe/Berlin"
 
 USE_I18N = True
 
-# django.utils.timezone.now() will return tz-aware datetime objects (in UTC)
-USE_TZ = True
+# True: django.utils.timezone.now() will return tz-aware datetime objects (in UTC)
+# False: django.utils.timezone.now() will return tz-unaware datetime objects
+USE_TZ = False
 
 # Directory for storing translation files
 # Run python manage.py makemessages -l de to create translation files
 LOCALE_PATHS = (BASE_DIR / "locale",)
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -140,11 +139,9 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Authentication
-AUTH_USER_MODEL = "users.User"
 LOGIN_URL = "users:login"
 LOGIN_REDIRECT_URL = "users:index"
 LOGOUT_REDIRECT_URL = "users:login"
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -172,3 +169,17 @@ EMAIL_USE_TLS = True
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_TEMPLATE_PACK = "tailwind"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+# Messages
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+CONFETTI_MESSAGE_LEVEL = 26
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+    CONFETTI_MESSAGE_LEVEL: "success",
+}
+
+# Encryption
+FERNET_KEY = os.getenv("FERNET_KEY")
+
+# CALCULATOR
+CALCULATION_EXTRA_DURATION_SECONDS = os.getenv("CALCULATION_EXTRA_DURATION", 1)

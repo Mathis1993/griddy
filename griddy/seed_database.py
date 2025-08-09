@@ -1,66 +1,32 @@
-from datetime import timedelta
-
-from devices.tests.factories import AddressFactory, DeviceFactory, ManufacturerFactory
-from devices.tests.factories.heat_pump_factories import SmartthingsHeatPumpFactory
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils import timezone
-from execution_conditions.tests.factories import (
-    ExecutionConditionFactory,
-    GlobalSwitchHeatPumpFactory,
-)
-from external.tests.factories import ApiConfigFactory, ApiKeyFactory
-from netzentgelte.tests.factories import ZipCodeFactory
+from electric_cars.json_import import CarImporter
+from electric_cars.tests.factories import CarFactory
+from electricity_rates.excel_import import NetworkOperatorImporter
+
+NETWORK_OPERATOR_DATA_PATH = "data/network_operators_costs_2025.xlsx"
+ELECTRIC_CARS_DATA_PATH = "data/electric_cars_2024.json"
 
 User = get_user_model()
 
 
 def seed_database():
-    _seed_database(
-        smartthings_api_key=settings.TEST_SMARTTHINGS_API_TOKEN,
-        smartthings_device_id=settings.TEST_SMARTTHINGS_DEVICE_ID,
-    )
+    _import_network_operator_data()
+    _import_electric_car_data()
+    _seed_database()
 
 
-def _seed_database(smartthings_api_key: str, smartthings_device_id: str):
-    user = User.objects.create_superuser(
-        email="john@ofus.com",
-        password=settings.TEST_USER_PASSWORD,
-    )
+def _seed_database():
+    # ZipCodeFactory.create_batch(size=10)
+    # NetworkOperatorFactory.create_batch(size=10)
+    # CarFactory.create_batch(size=10)
+    pass
 
-    api_config = ApiConfigFactory.create(
-        name="smartthings", base_url="https://api.smartthings.com/v1/"
-    )
-    api_key = ApiKeyFactory.create(
-        key=smartthings_api_key,
-        expiration=timezone.now() + timedelta(days=365),
-        user=user,
-        api_config=api_config,
-    )
 
-    zip_code = ZipCodeFactory.create(code="12345")
-    address = AddressFactory.create(zip_code=zip_code)
+def _import_network_operator_data():
+    importer = NetworkOperatorImporter(NETWORK_OPERATOR_DATA_PATH)
+    importer.import_network_operator_data()
 
-    manufacturer = ManufacturerFactory.create(name="samsung")
-    smartthings_heat_pump = SmartthingsHeatPumpFactory.create(
-        name="wingst_heat_pump",
-        api_key=api_key,
-        smartthings_device_id=smartthings_device_id,
-        default_flow_temperature_water=35,
-        default_flow_temperature_heating=35,
-    )
-    device = DeviceFactory.create(
-        name="wingst_device",
-        user=user,
-        address=address,
-        manufacturer=manufacturer,
-        specific_device=smartthings_heat_pump,
-    )
 
-    global_switch = GlobalSwitchHeatPumpFactory.create(control_heat_pump=False)
-    execution_condition = ExecutionConditionFactory.create(
-        name="control_wingst_heat_pump",
-        user=user,
-        specific_condition=global_switch,
-    )
-    device.execution_conditions.add(execution_condition)
+def _import_electric_car_data():
+    importer = CarImporter(ELECTRIC_CARS_DATA_PATH)
+    importer.import_cars()

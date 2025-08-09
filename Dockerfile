@@ -16,6 +16,8 @@ COPY . .
 RUN chown -R 1000:1000 /app && \
     chmod +x /app/scripts/startup_django.sh
 
+LABEL org.opencontainers.image.source="https://github.com/Mathis1993/griddy"
+
 CMD ["scripts/startup_django.sh"]
 
 FROM base AS staging

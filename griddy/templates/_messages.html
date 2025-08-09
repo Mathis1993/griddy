@@ -1,0 +1,22 @@
+<div id="messages" hx-swap-oob="true" class="w-full mt-4">
+  {% for message in messages %}
+    <div class="backdrop-blur-sm bg-white/10 rounded-xl p-4 border {% if message.tags == 'success' %}border-green-400/50 text-green-400{% elif message.tags == 'warning' %}border-yellow-400/50 text-yellow-400{% elif message.tags == 'error' %}border-red-400/50 text-red-400{% endif %} flex items-center justify-between w-full"
+         role="alert">
+      <div class="flex-1 px-2">{{ message | safe }}</div>
+      {% if message_emoji %}
+      <div class="animate-bounce px-2">
+        {{ message_emoji }}
+      </div>
+      {% endif %}
+      <div class="pl-2">
+        <button class="text-2xl leading-none hover:text-white transition-colors"
+                onclick="this.closest('[role=alert]').remove()">×
+        </button>
+      </div>
+    </div>
+
+    {% if message.level == 26 %}
+      {% include 'confetti.html' %}
+    {% endif %}
+  {% endfor %}
+</div>

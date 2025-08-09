@@ -1,0 +1,113 @@
+<form hx-post="" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="space-y-6">
+    <!-- Input Section -->
+    <div class="space-y-4 min-w-0">
+      <!-- Label -->
+      <label for="{{ field.id_for_label }}"
+             class="block text-lg font-medium text-white/90 text-center">
+        {{ field.label }}
+      </label>
+
+      <!-- Input and Button -->
+      <div class="flex gap-x-3 w-full items-center min-w-0">
+        <div class="w-full min-w-0 {% if field.field.widget.input_type == 'checkbox' %}flex justify-center items-center{% endif %}">
+          {{ field }}
+        </div>
+        <div class="flex items-center">
+                    <button class="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:pointer-events-none transition-all"
+                  type="submit">
+            <!-- Regular State -->
+            <div class="htmx-indicator">
+              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <!-- Loading State -->
+            <div class="htmx-request-indicator">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   height="24px"
+                   viewBox="0 -960 960 960"
+                   width="24px"
+                   fill="#FFFFFF">
+                <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error messages -->
+      {% if field.errors %}
+        <div class="mt-2">
+          <ul class="text-sm text-red-200">
+            {% for error in field.errors %}
+              <li class="flex items-center">
+                <svg class="mr-2 size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12" y2="16" />
+                </svg>
+                {{ error }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Help Section -->
+    <div class="border-t border-white/10">
+      <button type="button"
+              class="hs-collapse-toggle w-full px-6 py-3 inline-flex justify-between items-center gap-x-2 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+              id="help-collapse-{{ field.auto_id }}"
+              data-hs-collapse="#help-content-{{ field.auto_id }}">
+        <div class="flex items-center gap-x-2">
+          <svg class="size-4"
+               xmlns="http://www.w3.org/2000/svg"
+               width="24"
+               height="24"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2"
+               stroke-linecap="round"
+               stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <path d="M12 17h.01"/>
+          </svg>
+          <span class="hs-collapse-open:hidden">Genauere Erklärung gewünscht?</span>
+          <span class="hs-collapse-open:block hidden">Erklärung zuklappen</span>
+        </div>
+        <svg class="hs-collapse-open:rotate-180 size-4 text-white/70"
+             xmlns="http://www.w3.org/2000/svg"
+             width="24"
+             height="24"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </button>
+
+      <div id="help-content-{{ field.auto_id }}"
+           class="hs-collapse hidden overflow-hidden transition-[height] duration-300"
+           aria-labelledby="help-collapse-{{ field.auto_id }}">
+        <div class="px-6 py-4 text-sm text-white/80 bg-white/5 backdrop-blur-sm border-t border-white/10 rounded-b-lg">
+          <div class="break-words">
+          {{ field.help_text|default:"Ups, hier müssen wir noch eine genauere Erklärung einfügen." }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% if not full_page_load %}
+  {% include "_progress_section.html" %}
+{% endif %}
