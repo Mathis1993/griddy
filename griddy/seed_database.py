@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from electric_cars.json_import import CarImporter
-from electric_cars.tests.factories import CarFactory
 from electricity_rates.excel_import import NetworkOperatorImporter
 
 NETWORK_OPERATOR_DATA_PATH = "data/network_operators_costs_2025.xlsx"
