@@ -25,3 +25,6 @@ node_modules/
 
 # static files
 griddy/static_root
+
+# venv
+venv/
