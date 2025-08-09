@@ -1,7 +1,15 @@
 # griddy
-Welcome to griddy - a simple django/tailwind project for calculating the effect of switching to a dynamic electricity rate based on somebody's specific personal situation.
+A simple django project for calculating the effect of switching from a static to a dynamic electricity rate in Germany based on somebody's specific personal situation.
 
 ![griddy gif](data/griddy.gif)
+
+## Stack
+- Python 3.12+
+- Django 5.0+
+- PostgreSQL
+- Tailwind CSS
+- Preline UI
+- HTMX
 
 ## Run
 - Create a virtual environment (python 3.12 or higher) and install the requirements:
